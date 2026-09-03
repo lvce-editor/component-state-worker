@@ -1,0 +1,7 @@
+.tmp
+.vscode
+coverage
+node_modules
+*.log
+*.tsbuildinfo
+*.tgz
