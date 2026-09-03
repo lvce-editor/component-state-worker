@@ -25,6 +25,31 @@ jobs:
           node-version-file: '.nvmrc'
       - run: npm ci
       - run: npm run build
+      - run: npm run build:static
       - run: npm test
       - run: npm run type-check
       - run: npm run lint
+      - name: install playwright system dependencies
+        working-directory: ./packages/e2e
+        if: runner.os == 'Linux'
+        run: sudo npx playwright install-deps chromium firefox webkit
+      - name: install playwright browsers
+        working-directory: ./packages/e2e
+        run: npx playwright install chromium firefox webkit
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: e2e chromium
+        working-directory: ./packages/e2e
+        run: npm run e2e:headless
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: e2e firefox
+        working-directory: ./packages/e2e
+        run: npm run e2e:firefox:headless
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: e2e webkit
+        working-directory: ./packages/e2e
+        run: npm run e2e:webkit:headless
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0

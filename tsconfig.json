@@ -1,5 +1,10 @@
 {
   "files": [],
   "include": [],
-  "references": [{ "path": "./packages/component-state-worker" }, { "path": "./packages/build" }]
+  "references": [
+    { "path": "./packages/component-state-worker" },
+    { "path": "./packages/build" },
+    { "path": "./packages/e2e" },
+    { "path": "./packages/server" }
+  ]
 }
