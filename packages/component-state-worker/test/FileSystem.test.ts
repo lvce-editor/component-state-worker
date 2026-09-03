@@ -42,7 +42,7 @@ test('lists only editable live components', async () => {
     { editable: false, moduleId: 'Editor', uid: 8 },
   ])
 
-  await expect(FileSystem.readDirWithFileTypes()).resolves.toEqual([{ name: '7.json', type: 1 }])
+  await expect(FileSystem.readDirWithFileTypes()).resolves.toEqual([{ name: '7.json', type: 7 }])
 })
 
 test('checks whether an editable component exists', async () => {
