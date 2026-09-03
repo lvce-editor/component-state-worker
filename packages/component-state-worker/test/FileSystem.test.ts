@@ -29,7 +29,7 @@ test('writes parsed component state', async () => {
 })
 
 test('rejects non-object JSON state', async () => {
-  await expect(FileSystem.writeFile('live-component-state:///7.json', '[]')).rejects.toThrow('Component state must be a JSON object')
+  await expect(FileSystem.writeFile('live-component-state:///7.json', '[]')).rejects.toThrow('expected value to be of type object')
 })
 
 test('rejects invalid component state uris', async () => {
