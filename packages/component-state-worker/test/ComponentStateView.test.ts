@@ -78,3 +78,9 @@ test('renders editable and unavailable component cards', () => {
     },
   ])
 })
+
+test('renders the loading state before components are available', () => {
+  const dom = getComponentStateVirtualDom([], false)
+
+  expect(dom).toContainEqual(expect.objectContaining({ text: 'Loading live components…' }))
+})
