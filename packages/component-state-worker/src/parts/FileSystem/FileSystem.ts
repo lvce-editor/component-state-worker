@@ -1,12 +1,7 @@
+import * as Assert from '@lvce-editor/assert'
 import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
-
-const assertObject: (value: unknown) => asserts value is Record<string, unknown> = (value) => {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new TypeError('Component state must be a JSON object')
-  }
-}
 
 export const readFile = async (uri: string): Promise<string> => {
   const uid = LiveComponentStateUri.getUid(uri)
@@ -17,7 +12,7 @@ export const readFile = async (uri: string): Promise<string> => {
 export const writeFile = async (uri: string, content: string): Promise<void> => {
   const uid = LiveComponentStateUri.getUid(uri)
   const state: unknown = JSON.parse(content)
-  assertObject(state)
+  Assert.object(state)
   await RendererWorker.invoke('ComponentState.setState', uid, state)
 }
 
