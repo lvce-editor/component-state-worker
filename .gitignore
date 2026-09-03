@@ -1,7 +1,7 @@
 .tmp
+dist
 .vscode
 coverage
-dist
 node_modules
 *.log
 *.tsbuildinfo

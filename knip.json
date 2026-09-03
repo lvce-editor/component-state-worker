@@ -5,13 +5,21 @@
       "project": ["*.js"]
     },
     "packages/build": {
-      "entry": ["src/build.ts", "src/computeNodeModulesCacheKey.ts"],
+      "entry": ["src/build-static.ts", "src/build.ts", "src/computeNodeModulesCacheKey.ts", "src/dev.ts"],
       "project": ["src/**/*.ts"],
       "ignoreDependencies": ["esbuild"]
     },
     "packages/component-state-worker": {
       "entry": ["test/**/*.test.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
+    "packages/e2e": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/server": {
+      "entry": ["src/postinstall.js"],
+      "project": ["src/**/*.js"]
     }
   }
 }
