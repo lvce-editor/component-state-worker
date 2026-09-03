@@ -2,6 +2,7 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 
 jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
   RendererWorker: {
+    getComponents: jest.fn(),
     invoke: jest.fn(),
   },
 }))
@@ -37,7 +38,7 @@ test('rejects invalid component state uris', async () => {
 })
 
 test('lists only editable live components', async () => {
-  jest.mocked(RendererWorker.invoke).mockResolvedValue([
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue([
     { editable: true, moduleId: 'Explorer', uid: 7 },
     { editable: false, moduleId: 'Editor', uid: 8 },
   ])
@@ -46,7 +47,7 @@ test('lists only editable live components', async () => {
 })
 
 test('checks whether an editable component exists', async () => {
-  jest.mocked(RendererWorker.invoke).mockResolvedValue([
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue([
     { editable: true, moduleId: 'Explorer', uid: 7 },
     { editable: false, moduleId: 'Editor', uid: 8 },
   ])

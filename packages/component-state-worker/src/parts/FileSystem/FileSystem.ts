@@ -1,6 +1,5 @@
 import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
-import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
 
 const assertObject: (value: unknown) => asserts value is Record<string, unknown> = (value) => {
@@ -23,7 +22,7 @@ export const writeFile = async (uri: string, content: string): Promise<void> => 
 }
 
 export const readDirWithFileTypes = async (): Promise<readonly { readonly name: string; readonly type: number }[]> => {
-  const components = (await RendererWorker.invoke('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await RendererWorker.getComponents()
   return components.filter((component) => component.editable).map((component) => ({ name: `${component.uid}.json`, type: DirentType.File }))
 }
 
@@ -31,7 +30,7 @@ export const isReadonly = (): boolean => false
 
 export const exists = async (uri: string): Promise<boolean> => {
   const uid = LiveComponentStateUri.getUid(uri)
-  const components = (await RendererWorker.invoke('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await RendererWorker.getComponents()
   return components.some((component) => component.uid === uid && component.editable)
 }
 

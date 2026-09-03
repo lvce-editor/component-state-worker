@@ -10,6 +10,7 @@ import { resize } from '../src/parts/Resize/Resize.ts'
 
 jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
   RendererWorker: {
+    getComponents: jest.fn(),
     invoke: jest.fn(),
   },
 }))
@@ -25,7 +26,7 @@ beforeEach(() => {
 
 test('creates, loads, diffs, and renders the component grid', async () => {
   const components = [{ editable: true, moduleId: 'Explorer', uid: 9 }]
-  jest.mocked(RendererWorker.invoke).mockResolvedValue(components)
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
   create(7, 1, 2, 300, 400)
   const initial = ComponentStateViewStates.get(7).newState
   const loaded = await loadContent(initial)
