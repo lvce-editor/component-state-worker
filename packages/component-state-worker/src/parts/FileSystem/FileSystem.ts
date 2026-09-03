@@ -1,3 +1,4 @@
+import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
@@ -23,7 +24,7 @@ export const writeFile = async (uri: string, content: string): Promise<void> => 
 
 export const readDirWithFileTypes = async (): Promise<readonly { readonly name: string; readonly type: number }[]> => {
   const components = (await RendererWorker.invoke('ComponentState.getComponents')) as readonly ComponentInfo[]
-  return components.filter((component) => component.editable).map((component) => ({ name: `${component.uid}.json`, type: 1 }))
+  return components.filter((component) => component.editable).map((component) => ({ name: `${component.uid}.json`, type: DirentType.File }))
 }
 
 export const isReadonly = (): boolean => false
