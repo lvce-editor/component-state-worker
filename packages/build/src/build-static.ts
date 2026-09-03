@@ -1,5 +1,5 @@
-import { cp, readFile, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { cp, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { root } from './root.ts'
 
@@ -23,4 +23,7 @@ const staticWorker = `const componentStateWorkerUrl = \`\${assetDir}/packages/co
 const newContent = content.includes(localWorker) ? content.replace(localWorker, staticWorker) : content
 await writeFile(rendererWorkerPath, newContent)
 
+const workerTargetPath = join(root, 'dist', commitHash, 'packages', 'component-state-worker', 'dist', 'componentStateWorkerMain.js')
+await mkdir(dirname(workerTargetPath), { recursive: true })
+await cp(workerPath, workerTargetPath)
 await cp(join(root, 'dist'), join(root, '.tmp', 'static'), { recursive: true })
