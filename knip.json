@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "project": ["*.js"]
+    },
+    "packages/build": {
+      "entry": ["src/build.ts", "src/computeNodeModulesCacheKey.ts"],
+      "project": ["src/**/*.ts"],
+      "ignoreDependencies": ["esbuild"]
+    },
+    "packages/component-state-worker": {
+      "entry": ["test/**/*.test.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    }
+  }
+}
