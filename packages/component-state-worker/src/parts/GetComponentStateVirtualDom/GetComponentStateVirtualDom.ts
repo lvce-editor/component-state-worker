@@ -1,30 +1,37 @@
 import { text, type VirtualDomNode, VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
+import * as ClassNames from '../ClassNames/ClassNames.ts'
 import { getCard } from '../GetCard/GetCard.ts'
+
+const viewNode: VirtualDomNode = {
+  childCount: 3,
+  className: ClassNames.View,
+  type: VirtualDomElements.Div,
+}
+
+const headingNode: VirtualDomNode = {
+  childCount: 1,
+  className: ClassNames.Heading,
+  type: VirtualDomElements.H2,
+}
+
+const descriptionNode: VirtualDomNode = {
+  childCount: 1,
+  className: ClassNames.Description,
+  type: VirtualDomElements.Div,
+}
 
 export const getComponentStateVirtualDom = (components: readonly ComponentInfo[], loaded: boolean): readonly VirtualDomNode[] => {
   const description = loaded ? `${components.length} live components` : 'Loading live components…'
   return [
-    {
-      childCount: 3,
-      className: 'ComponentStateView',
-      type: VirtualDomElements.Div,
-    },
-    {
-      childCount: 1,
-      className: 'ComponentStateHeading',
-      type: VirtualDomElements.H2,
-    },
+    viewNode,
+    headingNode,
     text('Live Component State'),
-    {
-      childCount: 1,
-      className: 'ComponentStateDescription',
-      type: VirtualDomElements.Div,
-    },
+    descriptionNode,
     text(description),
     {
       childCount: components.length,
-      className: 'ComponentStateGrid',
+      className: ClassNames.Grid,
       type: VirtualDomElements.Div,
     },
     ...components.flatMap(getCard),

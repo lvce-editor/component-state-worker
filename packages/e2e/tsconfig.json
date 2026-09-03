@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
     "target": "esnext",
     "lib": ["esnext", "WebWorker"],
     "checkJs": true,
@@ -8,13 +12,13 @@
     "moduleResolution": "nodenext",
     "rootDir": ".",
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "composite": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noUncheckedSideEffectImports": true

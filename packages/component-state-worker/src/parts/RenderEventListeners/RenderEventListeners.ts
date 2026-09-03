@@ -1,6 +1,8 @@
+import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEventListenerFunctions.ts'
+
 export const renderEventListeners = (): readonly any[] => [
   {
-    name: 1,
+    name: DomEventListenerFunctions.HandleClick,
     params: ['handleClick', 'event.currentTarget.dataset.uid'],
     preventDefault: true,
   },

@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "webworker"],
     "checkJs": true,
     "target": "esnext",
-    "types": [],
+    "types": ["node"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,

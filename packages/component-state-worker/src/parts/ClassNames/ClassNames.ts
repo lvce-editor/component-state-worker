@@ -1,0 +1,8 @@
+export const Card = 'ComponentStateCard'
+export const CardStatus = 'ComponentStateCardStatus'
+export const CardTitle = 'ComponentStateCardTitle'
+export const CardUid = 'ComponentStateCardUid'
+export const Description = 'ComponentStateDescription'
+export const Grid = 'ComponentStateGrid'
+export const Heading = 'ComponentStateHeading'
+export const View = 'ComponentStateView'
