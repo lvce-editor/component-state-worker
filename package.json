@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "node packages/build/src/build.ts",
+    "build:static": "node packages/build/src/build-static.ts",
     "build:watch": "npm exec --workspace=packages/build -- esbuild --format=esm --bundle --watch packages/component-state-worker/src/componentStateWorkerMain.ts --outfile=.tmp/dist/dist/componentStateWorkerMain.js",
     "dev": "npm run build:watch",
     "format": "prettier --write .",
