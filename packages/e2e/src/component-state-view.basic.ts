@@ -2,11 +2,14 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.basic'
 
-// Enable after the Component State panel is integrated into LVCE Editor.
-export const skip = 1
-
-export const test: Test = async ({ Command, expect, Locator }) => {
-  await Command.execute('Layout.showPanel', 'ComponentState')
+export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspace }) => {
+  const tmpDir = await FileSystem.getTmpDir()
+  await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
+  await Workspace.setPath(tmpDir)
+  await Command.execute('Layout.showSideBar', 'Explorer')
+  const explorerView = Locator('.Explorer')
+  await expect(explorerView).toBeVisible()
+  await Command.execute('Developer.openComponentState')
 
   const view = Locator('.ComponentStateView')
   await expect(view).toBeVisible()
