@@ -3,6 +3,7 @@ import * as Create from '../Create/Create.ts'
 import * as Diff2 from '../Diff2/Diff2.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as HandleClick from '../HandleClick/HandleClick.ts'
+import * as HandleEditorChanged from '../HandleEditorChanged/HandleEditorChanged.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as Refresh from '../Refresh/Refresh.ts'
 import * as Render2 from '../Render2/Render2.ts'
@@ -29,4 +30,5 @@ export const commandMap = {
   'ComponentState.renderEventListeners': RenderEventListeners.renderEventListeners,
   'ComponentState.resize': ComponentStateViewStates.wrapCommand(Resize.resize),
   'ComponentState.writeFile': FileSystem.writeFile,
+  handleEditorChanged: HandleEditorChanged.handleEditorChanged,
 }
