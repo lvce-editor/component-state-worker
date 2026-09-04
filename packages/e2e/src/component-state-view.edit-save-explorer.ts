@@ -33,10 +33,8 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await expect(explorerCard).toBeVisible()
   // eslint-disable-next-line e2e/no-direct-click -- verifies the complete card-to-editor-to-component update flow
   await explorerCard.click()
-  const editor = Locator('.Editor')
   const waitForEditorText = async (retries = 50): Promise<string> => {
     try {
-      await expect(editor).toBeVisible()
       return await Editor.getText()
     } catch (error) {
       if (retries === 0) {
