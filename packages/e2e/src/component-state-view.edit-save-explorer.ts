@@ -6,11 +6,6 @@ interface ComponentInfo {
   readonly uid: number
 }
 
-interface TextDocument {
-  readonly text: string
-  readonly uri: string
-}
-
 export const name = 'component-state-view.edit-save-explorer'
 
 export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, Workspace }) => {
@@ -39,29 +34,14 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const explorerStateUri = `live-component-state:///${explorer.uid}.json`
   const fileContent = await FileSystem.readFile(explorerStateUri)
   const fileState = JSON.parse(fileContent)
+  await Main.closeAllEditors()
   await Main.openUri(explorerStateUri)
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
+  const editor = Locator('.Editor')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
+  await expect(editor).toBeVisible()
 
-  const readEditorText = async (retries = 50): Promise<string> => {
-    let failure: string
-    try {
-      const textDocument = (await Command.execute('GetActiveEditor.getTextDocument')) as TextDocument | undefined
-      if (textDocument?.uri === explorerStateUri) {
-        return textDocument.text
-      }
-      failure = `expected active editor URI ${explorerStateUri}, got ${textDocument?.uri}`
-    } catch (error) {
-      failure = String(error)
-    }
-    if (retries === 0) {
-      const mainState = await Command.execute('MainArea.saveState', 2)
-      throw new Error(`Failed to read the live state editor: ${failure}; main state: ${JSON.stringify(mainState)}`)
-    }
-    await Command.execute('Timeout.sleep', 100)
-    return readEditorText(retries - 1)
-  }
-  const state = JSON.parse(await readEditorText())
+  const state = JSON.parse(await Editor.getText())
   if (JSON.stringify(state) !== JSON.stringify(fileState)) {
     throw new Error('Expected the editor content to match the live file-system provider content')
   }
