@@ -43,7 +43,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
       return await Editor.getText()
     } catch (error) {
       if (retries === 0) {
-        const mainState = await Main.saveState(2)
+        const mainState = await Command.execute('MainArea.saveState', 2)
         throw new Error(`Failed to read the live state editor: ${error}; main state: ${JSON.stringify(mainState)}`)
       }
       await Command.execute('Timeout.sleep', 100)
