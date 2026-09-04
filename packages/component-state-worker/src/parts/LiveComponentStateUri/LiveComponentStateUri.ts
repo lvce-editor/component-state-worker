@@ -1,9 +1,11 @@
+import { InvalidLiveComponentStateUriError } from '../InvalidLiveComponentStateUriError/InvalidLiveComponentStateUriError.ts'
+
 const pattern = /^live-component-state:\/\/\/(\d+)\.json$/
 
 export const getUid = (uri: string): number => {
   const match = pattern.exec(uri)
   if (!match) {
-    throw new Error(`Invalid live component state URI: ${uri}`)
+    throw new InvalidLiveComponentStateUriError(uri)
   }
   return Number(match[1])
 }
