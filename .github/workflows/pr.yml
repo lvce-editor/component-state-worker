@@ -43,8 +43,14 @@ jobs:
         run: sudo npx playwright install-deps chromium firefox webkit
       - name: install playwright browsers
         working-directory: ./packages/e2e
-        run: npx playwright install chromium firefox webkit
+        run: npx playwright install chromium firefox
         if: steps.npm-cache.outputs.cache-hit != 'true'
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: install playwright webkit
+        working-directory: ./packages/e2e
+        if: runner.os != 'Windows'
+        run: npx playwright install webkit
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e chromium
@@ -58,6 +64,8 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e webkit
+        # Playwright's Windows WebKit worker does not expose OffscreenCanvas.
+        if: runner.os != 'Windows'
         working-directory: ./packages/e2e
         run: npm run e2e:webkit:headless
         env:
