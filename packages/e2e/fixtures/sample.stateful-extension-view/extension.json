@@ -1,0 +1,13 @@
+{
+  "activation": ["onView:sample.views.stateful"],
+  "browser": "main.js",
+  "isolated": true,
+  "views": [
+    {
+      "icon": "symbol-beaker",
+      "id": "sample.views.stateful",
+      "kind": "virtualDom",
+      "title": "Stateful Extension View"
+    }
+  ]
+}
