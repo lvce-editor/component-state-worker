@@ -1,5 +1,5 @@
 import * as Assert from '@lvce-editor/assert'
-import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
 
 const parseState = (content: string): Record<string, unknown> | undefined => {
@@ -12,15 +12,18 @@ const parseState = (content: string): Record<string, unknown> | undefined => {
   }
 }
 
-export const handleEditorChanged = async (editorUid: number, uri: string): Promise<void> => {
+export const handleEditorChanged = async (_editorUid: number, uri: string): Promise<void> => {
   let componentUid: number
   try {
     componentUid = LiveComponentStateUri.getUid(uri)
   } catch {
     return
   }
-  const content = await EditorWorker.invoke('Editor.getText', editorUid)
-  const state = parseState(content)
+  const textDocument = await RendererWorker.invoke('GetActiveEditor.getTextDocument')
+  if (!textDocument || textDocument.uri !== uri) {
+    return
+  }
+  const state = parseState(textDocument.text)
   if (!state) {
     return
   }
