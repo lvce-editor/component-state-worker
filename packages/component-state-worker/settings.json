@@ -1,0 +1,10 @@
+[
+  {
+    "category": "features",
+    "description": "Controls whether components without live state support are shown in the Live Component State view.",
+    "heading": "Show Unavailable Components",
+    "id": "componentStateView.showUnavailableComponents",
+    "type": "boolean",
+    "value": false
+  }
+]

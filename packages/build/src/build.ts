@@ -30,3 +30,4 @@ packageJson.main = 'dist/componentStateWorkerMain.js'
 await writeFile(join(dist, 'package.json'), JSON.stringify(packageJson, null, 2) + '\n')
 await cp(join(root, 'README.md'), join(dist, 'README.md'))
 await cp(join(root, 'LICENSE'), join(dist, 'LICENSE'))
+await cp(join(root, 'packages', 'component-state-worker', 'settings.json'), join(dist, 'dist', 'settings.json'))
