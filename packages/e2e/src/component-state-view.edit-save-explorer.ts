@@ -40,7 +40,16 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   const editor = Locator('.Editor')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
-  await expect(editor).toBeVisible()
+  try {
+    await expect(editor).toBeVisible()
+  } catch (error) {
+    const editorErrorMessage = Locator('.TextEditorErrorMessage')
+    try {
+      await expect(editorErrorMessage).toHaveText('__component_state_diagnostic__')
+    } catch (error_) {
+      throw new Error(`${error}; editor error: ${error_}`)
+    }
+  }
 
   const state = JSON.parse(await Editor.getText())
   if (JSON.stringify(state) !== JSON.stringify(fileState)) {
