@@ -8,12 +8,14 @@ interface ComponentInfo {
 
 export const name = 'component-state-view.edit-save-explorer'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, Workspace }) => {
+export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, Settings, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.setFiles([
     { content: 'first', uri: `${tmpDir}/a.txt` },
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
+  // Keep this component-state test independent of browser-specific font loading behavior.
+  await Settings.update({ 'editor.fontFamily': 'monospace' })
   await Workspace.setPath(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
 
