@@ -12,29 +12,14 @@ const parseState = (content: string): Record<string, unknown> | undefined => {
   }
 }
 
-const getEditorContent = async (uri: string): Promise<string | undefined> => {
-  const editorKeys = await EditorWorker.invoke('Editor.getKeys')
-  for (const editorKey of editorKeys) {
-    const editorUid = Number(editorKey)
-    const editorUri = await EditorWorker.invoke('Editor.getUri', editorUid)
-    if (editorUri === uri) {
-      return EditorWorker.invoke('Editor.getText', editorUid)
-    }
-  }
-  return undefined
-}
-
-export const handleEditorChanged = async (_editorUid: number, uri: string): Promise<void> => {
+export const handleEditorChanged = async (editorUid: number, uri: string): Promise<void> => {
   let componentUid: number
   try {
     componentUid = LiveComponentStateUri.getUid(uri)
   } catch {
     return
   }
-  const content = await getEditorContent(uri)
-  if (content === undefined) {
-    return
-  }
+  const content = await EditorWorker.invoke('Editor.getText', editorUid)
   const state = parseState(content)
   if (!state) {
     return
