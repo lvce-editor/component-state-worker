@@ -8,9 +8,11 @@ interface ComponentInfo {
 
 export const name = 'component-state-view.open-state'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Workspace }) => {
+export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Settings, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
+  // Keep this component-state test independent of browser-specific font loading behavior.
+  await Settings.update({ 'editor.fontFamily': 'monospace' })
   await Workspace.setPath(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   const explorerView = Locator('.Explorer')
