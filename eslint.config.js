@@ -16,7 +16,6 @@ export default defineConfig([
       '@cspell/spellchecker': 'off',
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
       'jest/no-restricted-jest-methods': 'off',
-      'prefer-destructuring': 'off',
     },
   },
 ])
