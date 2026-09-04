@@ -33,12 +33,20 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
 
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(explorerCard).toBeVisible()
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the complete card-to-editor-to-component update flow
-  await explorerCard.click()
+  const explorerStateUri = `live-component-state:///${explorer.uid}.json`
+  const fileContent = await FileSystem.readFile(explorerStateUri)
+  const fileState = JSON.parse(fileContent)
+  await Main.closeAllEditors()
+  await Main.openUri(explorerStateUri)
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
+  const editor = Locator('.Editor')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
+  await expect(editor).toBeVisible()
 
   const state = JSON.parse(await Editor.getText())
+  if (JSON.stringify(state) !== JSON.stringify(fileState)) {
+    throw new Error('Expected the editor content to match the live file-system provider content')
+  }
   await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
   await Main.save()
 
