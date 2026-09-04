@@ -50,9 +50,8 @@ jobs:
         run: npm run e2e:webkit:headless -- --trace-renderer-worker
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - name: Upload Windows WebKit trace
+      - name: Print Windows WebKit trace
         if: failure() && matrix.os == 'windows-2025'
-        uses: actions/upload-artifact@v7
-        with:
-          name: windows-webkit-renderer-worker-trace
-          path: ./packages/e2e/renderer-worker-traces
+        working-directory: ./packages/e2e
+        run: cat renderer-worker-traces/_all.json
+        shell: bash
