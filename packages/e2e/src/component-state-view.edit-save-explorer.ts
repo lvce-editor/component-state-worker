@@ -6,9 +6,32 @@ interface ComponentInfo {
   readonly uid: number
 }
 
+interface ComponentState {
+  readonly [key: string]: unknown
+  readonly uid: number
+}
+
 export const name = 'component-state-view.edit-save-explorer'
 
 export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, Settings, Workspace }) => {
+  const getComponentState = async (expectedUid: number): Promise<ComponentState> => {
+    let lastError: unknown
+    for (let attempt = 0; attempt < 40; attempt++) {
+      try {
+        const state = JSON.parse(await Editor.getText()) as ComponentState
+        const { uid } = state
+        if (uid !== expectedUid) {
+          throw new Error(`Expected state uid ${expectedUid}, got ${uid}`)
+        }
+        return state
+      } catch (error) {
+        lastError = error
+        await Command.execute('Timeout.sleep', 50)
+      }
+    }
+    throw lastError
+  }
+
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.setFiles([
     { content: 'first', uri: `${tmpDir}/a.txt` },
@@ -38,7 +61,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
 
-  const state = JSON.parse(await Editor.getText())
+  const state = await getComponentState(explorer.uid)
   await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
   await Main.save()
 

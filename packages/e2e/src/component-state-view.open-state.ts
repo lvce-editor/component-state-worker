@@ -6,9 +6,32 @@ interface ComponentInfo {
   readonly uid: number
 }
 
+interface ComponentState {
+  readonly [key: string]: unknown
+  readonly uid: number
+}
+
 export const name = 'component-state-view.open-state'
 
 export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Settings, Workspace }) => {
+  const getComponentState = async (expectedUid: number): Promise<ComponentState> => {
+    let lastError: unknown
+    for (let attempt = 0; attempt < 40; attempt++) {
+      try {
+        const state = JSON.parse(await Editor.getText()) as ComponentState
+        const { uid } = state
+        if (uid !== expectedUid) {
+          throw new Error(`Expected state uid ${expectedUid}, got ${uid}`)
+        }
+        return state
+      } catch (error) {
+        lastError = error
+        await Command.execute('Timeout.sleep', 50)
+      }
+    }
+    throw lastError
+  }
+
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   // Keep this component-state test independent of browser-specific font loading behavior.
@@ -31,11 +54,6 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   const editor = Locator('.Editor')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
+  await getComponentState(explorer.uid)
   await expect(editor).toBeVisible()
-  const content = await Editor.getText()
-  const state = JSON.parse(content)
-  const { uid } = state
-  if (uid !== explorer.uid) {
-    throw new Error(`Expected state uid ${explorer.uid}, got ${uid}`)
-  }
 }
