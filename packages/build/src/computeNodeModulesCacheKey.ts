@@ -10,7 +10,6 @@ const locations = [
   '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
   'packages/build/src/computeNodeModulesCacheKey.ts',
-  'packages/server/src/postinstall.js',
 ]
 
 const computeHash = async (): Promise<string> => {
