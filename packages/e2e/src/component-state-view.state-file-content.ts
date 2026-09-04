@@ -31,6 +31,10 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
   if ($schema !== `live-component-state:///schemas/${explorer.uid}.json`) {
     throw new Error(`Expected an Explorer state schema URI, got ${JSON.stringify($schema)}`)
   }
+  const schema = JSON.parse(await FileSystem.readFile($schema))
+  if (schema.properties?.focusedIndex?.type !== 'integer') {
+    throw new Error(`Expected the Explorer schema to describe focusedIndex, got ${JSON.stringify(schema)}`)
+  }
   if (JSON.stringify(componentState) !== JSON.stringify(liveState)) {
     throw new Error('Expected the state file to contain the current Explorer state')
   }

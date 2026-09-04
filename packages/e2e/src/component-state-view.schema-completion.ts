@@ -22,9 +22,10 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
   }
 
+  await Main.closeAllEditors()
   await Main.openUri(`live-component-state:///${explorer.uid}.json`)
-  await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  ""\n}\n`)
-  await Editor.setCursor(2, 3)
+  await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "focused"\n}\n`)
+  await Editor.setCursor(2, 10)
   await Editor.openCompletion()
 
   const completions = Locator('#Completions')

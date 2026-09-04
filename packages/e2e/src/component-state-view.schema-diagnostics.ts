@@ -22,19 +22,22 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
   }
 
+  await Main.closeAllEditors()
   await Main.openUri(`live-component-state:///${explorer.uid}.json`)
   await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "unknown": true\n}\n`)
-  await Editor.enableDiagnostics()
-
-  await Editor.shouldHaveDiagnostics([
-    {
-      columnIndex: 2,
-      endColumnIndex: 11,
-      endRowIndex: 2,
-      message: 'Property "unknown" is not allowed.',
-      rowIndex: 2,
-      source: 'json (schema_validation)',
-      type: 'error',
-    },
-  ])
+  const editorId = (await Command.execute('GetActiveEditor.getActiveEditorId')) as number
+  await Editor.shouldHaveDiagnosticProviderResult(
+    [
+      {
+        columnIndex: 2,
+        endColumnIndex: 11,
+        endRowIndex: 2,
+        message: 'Property "unknown" is not allowed.',
+        rowIndex: 2,
+        source: 'json (schema_validation)',
+        type: 'error',
+      },
+    ],
+    editorId,
+  )
 }

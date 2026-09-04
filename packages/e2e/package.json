@@ -4,12 +4,12 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "e2e": "test-with-playwright --only-extension=. --test-path=. --server-path=../server/src/dev.js --reuse-page",
-    "e2e:firefox": "test-with-playwright --only-extension=. --test-path=. --server-path=../server/src/dev.js --browser=firefox --reuse-page",
-    "e2e:firefox:headless": "test-with-playwright --only-extension=. --test-path=. --server-path=../server/src/dev.js --browser=firefox --headless --reuse-page",
-    "e2e:headless": "test-with-playwright --only-extension=. --test-path=. --server-path=../server/src/dev.js --headless --reuse-page",
-    "e2e:webkit": "test-with-playwright --only-extension=. --test-path=. --server-path=../server/src/dev.js --browser=webkit --reuse-page",
-    "e2e:webkit:headless": "test-with-playwright --only-extension=. --test-path=. --server-path=../server/src/dev.js --browser=webkit --headless --reuse-page",
+    "e2e": "test-with-playwright --only-extension=../../.tmp/extensions/builtin.language-features-json --test-path=. --server-path=../server/src/dev.js --reuse-page",
+    "e2e:firefox": "test-with-playwright --only-extension=../../.tmp/extensions/builtin.language-features-json --test-path=. --server-path=../server/src/dev.js --browser=firefox --reuse-page",
+    "e2e:firefox:headless": "test-with-playwright --only-extension=../../.tmp/extensions/builtin.language-features-json --test-path=. --server-path=../server/src/dev.js --browser=firefox --headless --reuse-page",
+    "e2e:headless": "test-with-playwright --only-extension=../../.tmp/extensions/builtin.language-features-json --test-path=. --server-path=../server/src/dev.js --headless --reuse-page",
+    "e2e:webkit": "test-with-playwright --only-extension=../../.tmp/extensions/builtin.language-features-json --test-path=. --server-path=../server/src/dev.js --browser=webkit --reuse-page",
+    "e2e:webkit:headless": "test-with-playwright --only-extension=../../.tmp/extensions/builtin.language-features-json --test-path=. --server-path=../server/src/dev.js --browser=webkit --headless --reuse-page",
     "type-check": "tsc"
   },
   "devDependencies": {
