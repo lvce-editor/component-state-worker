@@ -26,8 +26,12 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
   const uri = `live-component-state:///${explorer.uid}.json`
   const content = await FileSystem.readFile(uri)
   const fileState = JSON.parse(content)
+  const { $schema, ...componentState } = fileState
   const liveState = await Command.execute('ComponentState.getState', explorer.uid)
-  if (JSON.stringify(fileState) !== JSON.stringify(liveState)) {
+  if ($schema !== `live-component-state:///schemas/${explorer.uid}.json`) {
+    throw new Error(`Expected an Explorer state schema URI, got ${JSON.stringify($schema)}`)
+  }
+  if (JSON.stringify(componentState) !== JSON.stringify(liveState)) {
     throw new Error('Expected the state file to contain the current Explorer state')
   }
   if (!content.endsWith('\n') || !content.includes('\n  "')) {

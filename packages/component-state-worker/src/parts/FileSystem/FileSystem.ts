@@ -1,19 +1,42 @@
 import * as Assert from '@lvce-editor/assert'
 import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
+import * as CreateStateSchema from '../CreateStateSchema/CreateStateSchema.ts'
+import * as LiveComponentStateSchemaUri from '../LiveComponentStateSchemaUri/LiveComponentStateSchemaUri.ts'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
 
-export const readFile = async (uri: string): Promise<string> => {
-  const uid = LiveComponentStateUri.getUid(uri)
+const getNormalizedState = async (uid: number): Promise<Record<string, unknown>> => {
   const state = await RendererWorker.invoke('ComponentState.getState', uid)
-  return `${JSON.stringify(state, null, 2)}\n`
+  const serializedState = JSON.stringify(state)
+  return JSON.parse(serializedState)
+}
+
+const withoutSchemaProperty = (state: Readonly<Record<string, unknown>>): Record<string, unknown> => {
+  return Object.fromEntries(Object.entries(state).filter(([key]) => key !== '$schema'))
+}
+
+export const readFile = async (uri: string): Promise<string> => {
+  if (LiveComponentStateSchemaUri.is(uri)) {
+    const uid = LiveComponentStateSchemaUri.getUid(uri)
+    const state = await getNormalizedState(uid)
+    const schema = CreateStateSchema.createStateSchema(state, uri)
+    return `${JSON.stringify(schema, null, 2)}\n`
+  }
+  const uid = LiveComponentStateUri.getUid(uri)
+  const state = withoutSchemaProperty(await getNormalizedState(uid))
+  const stateWithSchema = {
+    $schema: LiveComponentStateSchemaUri.toUri(uid),
+    ...state,
+  }
+  return `${JSON.stringify(stateWithSchema, null, 2)}\n`
 }
 
 export const writeFile = async (uri: string, content: string): Promise<void> => {
   const uid = LiveComponentStateUri.getUid(uri)
   const state: unknown = JSON.parse(content)
   Assert.object(state)
-  await RendererWorker.invoke('ComponentState.setState', uid, state)
+  const componentState = withoutSchemaProperty(state as Record<string, unknown>)
+  await RendererWorker.invoke('ComponentState.setState', uid, componentState)
 }
 
 export const readDirWithFileTypes = async (): Promise<readonly { readonly name: string; readonly type: number }[]> => {
@@ -21,10 +44,10 @@ export const readDirWithFileTypes = async (): Promise<readonly { readonly name: 
   return components.filter((component) => component.editable).map((component) => ({ name: `${component.uid}.json`, type: DirentType.File }))
 }
 
-export const isReadonly = (): boolean => false
+export const isReadonly = (uri = ''): boolean => LiveComponentStateSchemaUri.is(uri)
 
 export const exists = async (uri: string): Promise<boolean> => {
-  const uid = LiveComponentStateUri.getUid(uri)
+  const uid = LiveComponentStateSchemaUri.is(uri) ? LiveComponentStateSchemaUri.getUid(uri) : LiveComponentStateUri.getUid(uri)
   const components = await RendererWorker.getComponents()
   return components.some((component) => component.uid === uid && component.editable)
 }
