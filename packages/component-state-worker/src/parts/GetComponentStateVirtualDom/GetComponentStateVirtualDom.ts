@@ -2,18 +2,13 @@ import { text, type VirtualDomNode, VirtualDomElements } from '@lvce-editor/virt
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 import * as ClassNames from '../ClassNames/ClassNames.ts'
 import { getColumnCount } from '../GetColumnCount/GetColumnCount.ts'
+import { getHeader } from '../GetHeader/GetHeader.ts'
 import { getRows } from '../GetRows/GetRows.ts'
 
 const viewNode: VirtualDomNode = {
   childCount: 3,
   className: ClassNames.View,
   type: VirtualDomElements.Div,
-}
-
-const headingNode: VirtualDomNode = {
-  childCount: 1,
-  className: ClassNames.Heading,
-  type: VirtualDomElements.H2,
 }
 
 const descriptionNode: VirtualDomNode = {
@@ -32,8 +27,7 @@ export const getComponentStateVirtualDom = (
   const rowCount = Math.ceil(components.length / columnCount)
   return [
     viewNode,
-    headingNode,
-    text('Live Component State'),
+    ...getHeader(),
     descriptionNode,
     text(description),
     {

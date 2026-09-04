@@ -20,6 +20,7 @@ jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
 const { RendererWorker } = await import('@lvce-editor/rpc-registry')
 const { handleClick } = await import('../src/parts/HandleClick/HandleClick.ts')
 const { loadContent } = await import('../src/parts/LoadContent/LoadContent.ts')
+const { refresh } = await import('../src/parts/Refresh/Refresh.ts')
 
 beforeEach(() => {
   ComponentStateViewStates.dispose(7)
@@ -64,6 +65,22 @@ test('shows unavailable components when configured', async () => {
   const initial = ComponentStateViewStates.get(7).newState
 
   await expect(loadContent(initial)).resolves.toMatchObject({ components, loaded: true })
+})
+
+test('refreshes the live component list', async () => {
+  const initialComponents = [{ editable: true, moduleId: 'Explorer', uid: 9 }]
+  const refreshedComponents = [...initialComponents, { editable: true, moduleId: 'Search', uid: 10 }]
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue(refreshedComponents)
+  jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
+  create(7, 1, 2, 300, 400)
+  const initial = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: initialComponents,
+    loaded: true,
+  }
+
+  await expect(refresh(initial)).resolves.toMatchObject({ components: refreshedComponents, loaded: true })
+  expect(RendererWorker.getComponents).toHaveBeenCalledTimes(1)
 })
 
 test('returns no diff or render commands for unchanged state', () => {
@@ -125,7 +142,19 @@ test('renders editable and unavailable component cards', () => {
       params: ['handleClick', 'event.currentTarget.dataset.uid'],
       preventDefault: true,
     },
+    {
+      name: 2,
+      params: ['refresh'],
+      preventDefault: true,
+    },
   ])
+})
+
+test('renders a refresh action button', () => {
+  const dom = getComponentStateVirtualDom([], true, 300)
+
+  expect(dom).toContainEqual(expect.objectContaining({ ariaLabel: 'Refresh', className: 'IconButton', onClick: 2, title: 'Refresh' }))
+  expect(dom).toContainEqual(expect.objectContaining({ className: 'MaskIcon MaskIconRefresh' }))
 })
 
 test('renders the loading state before components are available', () => {
