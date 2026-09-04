@@ -32,7 +32,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(explorerCard).toBeVisible()
   const explorerStateUri = `live-component-state:///${explorer.uid}.json`
-  const fileContent = await Command.execute('ComponentState.readFile', explorerStateUri)
+  const fileContent = await FileSystem.readFile(explorerStateUri)
   const fileState = JSON.parse(fileContent)
   await Main.openUri(explorerStateUri)
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
