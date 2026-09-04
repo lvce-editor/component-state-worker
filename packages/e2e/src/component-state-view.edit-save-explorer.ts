@@ -16,6 +16,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   ])
   await Workspace.setPath(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
+  await Command.execute('Preferences.update', { 'editor.fontFamily': 'monospace' })
 
   const firstExplorerItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
   const secondExplorerItem = Locator('.Explorer .TreeItem[aria-label="b.txt"]')
@@ -39,16 +40,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   const editor = Locator('.Editor')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
-  try {
-    await expect(editor).toBeVisible()
-  } catch (error) {
-    const editorErrorMessage = Locator('.TextEditorErrorMessage')
-    try {
-      await expect(editorErrorMessage).toHaveText('__component_state_diagnostic__')
-    } catch (error_) {
-      throw new Error(`${error}; editor error: ${error_}`)
-    }
-  }
+  await expect(editor).toBeVisible()
 
   const state = JSON.parse(await Editor.getText())
   if (JSON.stringify(state) !== JSON.stringify(fileState)) {
