@@ -1,6 +1,6 @@
 import { InvalidLiveComponentStateUriError } from '../InvalidLiveComponentStateUriError/InvalidLiveComponentStateUriError.ts'
 
-const pattern = /^live-component-state:\/\/\/(\d+)\.json$/
+const pattern = /^live-component-state:\/\/\/(\d+(?:\.\d+)?)\.json$/
 
 export const getUid = (uri: string): number => {
   const match = pattern.exec(uri)
