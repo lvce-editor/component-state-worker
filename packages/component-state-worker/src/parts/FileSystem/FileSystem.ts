@@ -1,10 +1,12 @@
 import * as Assert from '@lvce-editor/assert'
 import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
+import * as EditorChangeListener from '../EditorChangeListener/EditorChangeListener.ts'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
 
 export const readFile = async (uri: string): Promise<string> => {
   const uid = LiveComponentStateUri.getUid(uri)
+  await EditorChangeListener.register()
   const state = await RendererWorker.invoke('ComponentState.getState', uid)
   return `${JSON.stringify(state, null, 2)}\n`
 }
