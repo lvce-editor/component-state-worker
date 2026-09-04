@@ -1,6 +1,7 @@
 import * as Assert from '@lvce-editor/assert'
 import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
+import * as RemoveSchemaProperty from '../RemoveSchemaProperty/RemoveSchemaProperty.ts'
 
 const parseState = (content: string): Record<string, unknown> | undefined => {
   try {
@@ -24,5 +25,5 @@ export const handleEditorChanged = async (editorUid: number, uri: string): Promi
   if (!state) {
     return
   }
-  await RendererWorker.invoke('ComponentState.setState', componentUid, state)
+  await RendererWorker.invoke('ComponentState.setState', componentUid, RemoveSchemaProperty.removeSchemaProperty(state))
 }

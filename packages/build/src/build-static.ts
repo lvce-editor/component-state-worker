@@ -1,17 +1,22 @@
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { downloadJsonLanguageFeatures, jsonLanguageFeaturesPath } from './downloadJsonLanguageFeatures.ts'
 import { root } from './root.ts'
 
 const sharedProcessPath = join(root, 'node_modules', '@lvce-editor', 'shared-process', 'index.js')
 const sharedProcess = await import(pathToFileURL(sharedProcessPath).toString())
 
 process.env.PATH_PREFIX = '/component-state-worker'
+await downloadJsonLanguageFeatures()
 const { commitHash } = await sharedProcess.exportStatic({
   extensionPath: '',
+  extensionPaths: [jsonLanguageFeaturesPath],
   root,
   testPath: 'packages/e2e',
 })
+
+await cp(jsonLanguageFeaturesPath, join(root, 'dist', commitHash, 'extensions', 'builtin.language-features-json'), { recursive: true })
 
 const rendererWorkerPath = join(root, 'dist', commitHash, 'packages', 'renderer-worker', 'dist', 'rendererWorkerMain.js')
 const content = await readFile(rendererWorkerPath, 'utf8')

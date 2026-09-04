@@ -17,7 +17,7 @@ beforeEach(() => {
 })
 
 test('updates a component from valid editor content', async () => {
-  jest.mocked(EditorWorker.invoke).mockResolvedValue('{"title":"Instant title","uid":7}')
+  jest.mocked(EditorWorker.invoke).mockResolvedValue('{"$schema":"live-component-state:///schemas/7.json","title":"Instant title","uid":7}')
 
   await handleEditorChanged(99, 'live-component-state:///7.json')
 
