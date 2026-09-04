@@ -8,7 +8,7 @@ interface ComponentInfo {
 
 export const name = 'component-state-view.open-state'
 
-export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspace }) => {
+export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   await Workspace.setPath(tmpDir)
@@ -23,6 +23,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspa
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
   }
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
+  await Main.closeAllEditors()
   // eslint-disable-next-line e2e/no-direct-click -- verifies that a rendered component card opens its live JSON state
   await explorerCard.click()
 
