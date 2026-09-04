@@ -6,4 +6,9 @@ export const renderEventListeners = (): readonly any[] => [
     params: ['handleClick', 'event.currentTarget.dataset.uid'],
     preventDefault: true,
   },
+  {
+    name: DomEventListenerFunctions.HandleRefresh,
+    params: ['refresh'],
+    preventDefault: true,
+  },
 ]

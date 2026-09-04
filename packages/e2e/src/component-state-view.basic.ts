@@ -15,4 +15,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspa
   await expect(view).toBeVisible()
   await expect(view.locator('.ComponentStateHeading')).toHaveText('Live Component State')
   await expect(view.locator('.ComponentStateDescription')).toContainText('live components')
+  const refreshButton = view.locator('button[aria-label="Refresh"]')
+  await expect(refreshButton).toBeVisible()
+  await expect(refreshButton).toHaveAttribute('title', 'Refresh')
 }
