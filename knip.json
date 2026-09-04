@@ -16,6 +16,10 @@
     "packages/e2e": {
       "entry": ["src/**/*.ts"],
       "project": ["src/**/*.ts"]
+    },
+    "packages/server": {
+      "entry": ["src/dev.js"],
+      "project": ["src/**/*.js"]
     }
   }
 }

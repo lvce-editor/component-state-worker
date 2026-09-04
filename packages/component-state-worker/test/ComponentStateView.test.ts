@@ -12,6 +12,7 @@ import { resize } from '../src/parts/Resize/Resize.ts'
 jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
   RendererWorker: {
     getComponents: jest.fn(),
+    getPreference: jest.fn(),
     invoke: jest.fn(),
   },
 }))
@@ -36,6 +37,33 @@ test('creates, loads, diffs, and renders the component rows', async () => {
   expect(diff2(7)).toEqual([1])
   expect(render2(7, [1])).toEqual([[ViewletCommand.SetDom2, 7, getComponentStateVirtualDom(components, true, 300)]])
   expect(ComponentStateViewStates.get(7).oldState).toBe(loaded)
+})
+
+test('hides unavailable components by default', async () => {
+  const components = [
+    { editable: true, moduleId: 'Explorer', uid: 9 },
+    { editable: false, moduleId: 'Editor', uid: 10 },
+  ]
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
+  jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
+  create(7, 1, 2, 300, 400)
+  const initial = ComponentStateViewStates.get(7).newState
+
+  await expect(loadContent(initial)).resolves.toMatchObject({ components: [components[0]], loaded: true })
+  expect(RendererWorker.getPreference).toHaveBeenCalledWith('componentStateView.showUnavailableComponents')
+})
+
+test('shows unavailable components when configured', async () => {
+  const components = [
+    { editable: true, moduleId: 'Explorer', uid: 9 },
+    { editable: false, moduleId: 'Editor', uid: 10 },
+  ]
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
+  jest.mocked(RendererWorker.getPreference).mockResolvedValue(true)
+  create(7, 1, 2, 300, 400)
+  const initial = ComponentStateViewStates.get(7).newState
+
+  await expect(loadContent(initial)).resolves.toMatchObject({ components, loaded: true })
 })
 
 test('returns no diff or render commands for unchanged state', () => {
