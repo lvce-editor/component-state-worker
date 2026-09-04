@@ -35,7 +35,18 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
 
-  const state = JSON.parse(await Editor.getText())
+  const readEditorText = async (retries = 50): Promise<string> => {
+    try {
+      return await Editor.getText()
+    } catch (error) {
+      if (retries === 0) {
+        throw error
+      }
+      await Command.execute('Timeout.sleep', 100)
+      return readEditorText(retries - 1)
+    }
+  }
+  const state = JSON.parse(await readEditorText())
   await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
   await Main.save()
 
