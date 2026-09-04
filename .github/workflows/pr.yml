@@ -46,12 +46,9 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e webkit
+        # Playwright's Windows WebKit worker does not expose OffscreenCanvas.
+        if: runner.os != 'Windows'
         working-directory: ./packages/e2e
-        run: npm run e2e:webkit:headless -- --trace-renderer-worker
+        run: npm run e2e:webkit:headless
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - name: Print Windows WebKit trace
-        if: failure() && matrix.os == 'windows-2025'
-        working-directory: ./packages/e2e
-        run: cat renderer-worker-traces/_all.json
-        shell: bash
