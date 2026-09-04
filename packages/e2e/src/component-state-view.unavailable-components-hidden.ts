@@ -8,7 +8,8 @@ interface ComponentInfo {
 
 export const name = 'component-state-view.unavailable-components-hidden'
 
-export const test: Test = async ({ Command, expect, FileSystem, Locator, Settings, Workspace }) => {
+export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Settings, Workspace }) => {
+  await Main.closeAllEditors()
   await Settings.update({ 'componentStateView.showUnavailableComponents': false })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
