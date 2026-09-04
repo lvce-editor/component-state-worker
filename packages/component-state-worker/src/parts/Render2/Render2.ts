@@ -8,5 +8,5 @@ export const render2 = (uid: number, diffResult: readonly number[]): readonly an
   if (diffResult.length === 0) {
     return []
   }
-  return [[ViewletCommand.SetDom2, uid, getComponentStateVirtualDom(newState.components, newState.loaded)]]
+  return [[ViewletCommand.SetDom2, uid, getComponentStateVirtualDom(newState.components, newState.loaded, newState.width)]]
 }
