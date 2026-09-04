@@ -23,15 +23,15 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   }
 
   await Main.openUri(`live-component-state:///${explorer.uid}.json`)
-  await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "focusedIndex": "invalid"\n}\n`)
+  await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "unknown": true\n}\n`)
   await Editor.enableDiagnostics()
 
   await Editor.shouldHaveDiagnostics([
     {
-      columnIndex: 18,
-      endColumnIndex: 27,
+      columnIndex: 2,
+      endColumnIndex: 11,
       endRowIndex: 2,
-      message: 'Incorrect type. Expected "integer" but received "string".',
+      message: 'Property "unknown" is not allowed.',
       rowIndex: 2,
       source: 'json (schema_validation)',
       type: 'error',

@@ -2,17 +2,15 @@ import * as Assert from '@lvce-editor/assert'
 import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as CreateStateSchema from '../CreateStateSchema/CreateStateSchema.ts'
+import * as EditorChangeListener from '../EditorChangeListener/EditorChangeListener.ts'
 import * as LiveComponentStateSchemaUri from '../LiveComponentStateSchemaUri/LiveComponentStateSchemaUri.ts'
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
+import * as RemoveSchemaProperty from '../RemoveSchemaProperty/RemoveSchemaProperty.ts'
 
 const getNormalizedState = async (uid: number): Promise<Record<string, unknown>> => {
   const state = await RendererWorker.invoke('ComponentState.getState', uid)
   const serializedState = JSON.stringify(state)
   return JSON.parse(serializedState)
-}
-
-const withoutSchemaProperty = (state: Readonly<Record<string, unknown>>): Record<string, unknown> => {
-  return Object.fromEntries(Object.entries(state).filter(([key]) => key !== '$schema'))
 }
 
 export const readFile = async (uri: string): Promise<string> => {
@@ -23,7 +21,8 @@ export const readFile = async (uri: string): Promise<string> => {
     return `${JSON.stringify(schema, null, 2)}\n`
   }
   const uid = LiveComponentStateUri.getUid(uri)
-  const state = withoutSchemaProperty(await getNormalizedState(uid))
+  await EditorChangeListener.register()
+  const state = RemoveSchemaProperty.removeSchemaProperty(await getNormalizedState(uid))
   const stateWithSchema = {
     $schema: LiveComponentStateSchemaUri.toUri(uid),
     ...state,
@@ -35,7 +34,7 @@ export const writeFile = async (uri: string, content: string): Promise<void> => 
   const uid = LiveComponentStateUri.getUid(uri)
   const state: unknown = JSON.parse(content)
   Assert.object(state)
-  const componentState = withoutSchemaProperty(state as Record<string, unknown>)
+  const componentState = RemoveSchemaProperty.removeSchemaProperty(state as Record<string, unknown>)
   await RendererWorker.invoke('ComponentState.setState', uid, componentState)
 }
 

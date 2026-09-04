@@ -1,13 +1,16 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 
 jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
+  EditorWorker: {
+    invoke: jest.fn(),
+  },
   RendererWorker: {
     getComponents: jest.fn(),
     invoke: jest.fn(),
   },
 }))
 
-const { RendererWorker } = await import('@lvce-editor/rpc-registry')
+const { EditorWorker, RendererWorker } = await import('@lvce-editor/rpc-registry')
 const FileSystem = await import('../src/parts/FileSystem/FileSystem.ts')
 
 beforeEach(() => {
@@ -20,6 +23,7 @@ test('reads formatted component state', async () => {
   await expect(FileSystem.readFile('live-component-state:///7.json')).resolves.toBe(
     '{\n  "$schema": "live-component-state:///schemas/7.json",\n  "focusedIndex": 2,\n  "uid": 7\n}\n',
   )
+  expect(EditorWorker.invoke).toHaveBeenCalledWith('Listener.register', 1, 9113)
   expect(RendererWorker.invoke).toHaveBeenCalledWith('ComponentState.getState', 7)
 })
 
