@@ -26,11 +26,22 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   // eslint-disable-next-line e2e/no-direct-click -- verifies that a rendered component card opens its live JSON state
   await explorerCard.click()
 
-  const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   const editor = Locator('.Editor')
+  const waitForEditorText = async (retries = 50): Promise<string> => {
+    try {
+      await expect(editor).toBeVisible()
+      return await Editor.getText()
+    } catch (error) {
+      if (retries === 0) {
+        throw error
+      }
+      await Command.execute('Timeout.sleep', 100)
+      return waitForEditorText(retries - 1)
+    }
+  }
+  const content = await waitForEditorText()
+  const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
-  await expect(editor).toBeVisible()
-  const content = await Editor.getText()
   const state = JSON.parse(content)
   const { uid } = state
   if (uid !== explorer.uid) {

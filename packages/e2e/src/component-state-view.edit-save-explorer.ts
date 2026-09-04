@@ -33,10 +33,24 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await expect(explorerCard).toBeVisible()
   // eslint-disable-next-line e2e/no-direct-click -- verifies the complete card-to-editor-to-component update flow
   await explorerCard.click()
+  const editor = Locator('.Editor')
+  const waitForEditorText = async (retries = 50): Promise<string> => {
+    try {
+      await expect(editor).toBeVisible()
+      return await Editor.getText()
+    } catch (error) {
+      if (retries === 0) {
+        throw error
+      }
+      await Command.execute('Timeout.sleep', 100)
+      return waitForEditorText(retries - 1)
+    }
+  }
+  const content = await waitForEditorText()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
 
-  const state = JSON.parse(await Editor.getText())
+  const state = JSON.parse(content)
   await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
   await Main.save()
 
