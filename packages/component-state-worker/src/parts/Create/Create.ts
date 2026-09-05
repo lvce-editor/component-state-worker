@@ -4,6 +4,7 @@ import * as ComponentStateViewStates from '../ComponentStateViewStates/Component
 export const create = (uid: number, x: number, y: number, width: number, height: number): void => {
   const state: ComponentStateViewState = {
     components: [],
+    dragUri: '',
     height,
     loaded: false,
     uid,

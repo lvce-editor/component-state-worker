@@ -7,6 +7,7 @@ import * as GetMenuEntryIds from '../GetMenuEntryIds/GetMenuEntryIds.ts'
 import * as HandleClick from '../HandleClick/HandleClick.ts'
 import * as HandleContextMenu from '../HandleContextMenu/HandleContextMenu.ts'
 import * as HandleEditorChanged from '../HandleEditorChanged/HandleEditorChanged.ts'
+import * as HandlePointerDown from '../HandlePointerDown/HandlePointerDown.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as Refresh from '../Refresh/Refresh.ts'
 import * as Render2 from '../Render2/Render2.ts'
@@ -17,6 +18,7 @@ import * as ShowDom from '../ShowDom/ShowDom.ts'
 export const viewCommandMap = {
   'ComponentState.handleClick': ComponentStateViewStates.wrapCommand(HandleClick.handleClick),
   'ComponentState.handleContextMenu': ComponentStateViewStates.wrapCommand(HandleContextMenu.handleContextMenu),
+  'ComponentState.handlePointerDown': ComponentStateViewStates.wrapCommand(HandlePointerDown.handlePointerDown),
   'ComponentState.refresh': ComponentStateViewStates.wrapCommand(Refresh.refresh),
   'ComponentState.showDom': ComponentStateViewStates.wrapCommand(ShowDom.showDom),
 }
