@@ -16,8 +16,10 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
   await Command.execute('Layout.showSideBar', 'Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
   await Command.execute('Developer.openComponentState')
+  const view = Locator('.ComponentStateView')
+  await expect(view).toBeVisible()
+  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
 
   if (components.length === 0) {
     throw new Error('Expected at least one live component')
