@@ -1,6 +1,18 @@
 import { expect, test } from '@jest/globals'
 import * as CreateStateSchema from '../src/parts/CreateStateSchema/CreateStateSchema.ts'
 
+test.each([{}, { 'live-component-state:///10.json': '/file-icons/json.svg' }])(
+  'describes fileIconCache as a string dictionary: %j',
+  (fileIconCache) => {
+    const schema = CreateStateSchema.createStateSchema({ fileIconCache }, 'live-component-state:///schemas/2.json')
+
+    expect(schema.properties?.fileIconCache).toEqual({
+      additionalProperties: { type: 'string' },
+      type: 'object',
+    })
+  },
+)
+
 test('infers JSON schema property types recursively', () => {
   expect(
     CreateStateSchema.createStateSchema(
