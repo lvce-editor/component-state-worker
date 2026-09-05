@@ -38,7 +38,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   }
   // Keep the filter inside the component so this also covers its compact layout.
   await Editor.setText(
-    `${JSON.stringify({ ...state, filterValue: 'live state filter', inputSource: 2, smallWidthBreakPoint: 10000 }, null, 2)}\n`,
+    `${JSON.stringify({ ...state, filterValue: 'live state filter', inputSource: 2, smallWidthBreakPoint: 10_000 }, null, 2)}\n`,
   )
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
