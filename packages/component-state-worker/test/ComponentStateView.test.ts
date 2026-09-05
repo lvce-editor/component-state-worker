@@ -1,5 +1,6 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
 import { ViewletCommand } from '@lvce-editor/constants'
+import type { ComponentStateViewState } from '../src/parts/ComponentStateViewState/ComponentStateViewState.ts'
 import * as ComponentStateViewStates from '../src/parts/ComponentStateViewStates/ComponentStateViewStates.ts'
 import { create } from '../src/parts/Create/Create.ts'
 import { diff2 } from '../src/parts/Diff2/Diff2.ts'
@@ -243,7 +244,7 @@ test('prepares the pointed component URI without opening or rerendering the card
       { editable: true, moduleId: 'Search', uid: 42 },
     ],
   }
-  let state = initial
+  let state: ComponentStateViewState = initial
   for (const uid of ['0.25', '42', '0.25']) {
     const next = handlePointerDown(state, 0, uid)
     ComponentStateViewStates.set(7, state, next, next)
