@@ -1,6 +1,7 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
 interface ComponentInfo {
+  readonly displayName?: string
   readonly editable: boolean
   readonly moduleId: string
   readonly uid: number
@@ -21,6 +22,6 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
 
   for (const component of components) {
     const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
-    await expect(card.locator('.ComponentStateCardTitle')).toHaveText(component.moduleId)
+    await expect(card.locator('.ComponentStateCardTitle')).toHaveText(component.displayName || component.moduleId)
   }
 }

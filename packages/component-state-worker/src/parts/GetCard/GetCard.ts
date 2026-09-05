@@ -33,7 +33,7 @@ export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => 
       type: VirtualDomElements.Button,
     },
     titleNode,
-    text(component.moduleId),
+    text(component.displayName || component.moduleId),
     uidNode,
     text(`uid ${component.uid}`),
     statusNode,
