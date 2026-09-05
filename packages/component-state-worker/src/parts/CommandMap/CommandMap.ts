@@ -2,17 +2,23 @@ import * as ComponentStateViewStates from '../ComponentStateViewStates/Component
 import * as Create from '../Create/Create.ts'
 import * as Diff2 from '../Diff2/Diff2.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
+import * as GetMenuEntries from '../GetMenuEntries/GetMenuEntries.ts'
+import * as GetMenuEntryIds from '../GetMenuEntryIds/GetMenuEntryIds.ts'
 import * as HandleClick from '../HandleClick/HandleClick.ts'
+import * as HandleContextMenu from '../HandleContextMenu/HandleContextMenu.ts'
 import * as HandleEditorChanged from '../HandleEditorChanged/HandleEditorChanged.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as Refresh from '../Refresh/Refresh.ts'
 import * as Render2 from '../Render2/Render2.ts'
 import * as RenderEventListeners from '../RenderEventListeners/RenderEventListeners.ts'
 import * as Resize from '../Resize/Resize.ts'
+import * as ShowDom from '../ShowDom/ShowDom.ts'
 
 export const viewCommandMap = {
   'ComponentState.handleClick': ComponentStateViewStates.wrapCommand(HandleClick.handleClick),
+  'ComponentState.handleContextMenu': ComponentStateViewStates.wrapCommand(HandleContextMenu.handleContextMenu),
   'ComponentState.refresh': ComponentStateViewStates.wrapCommand(Refresh.refresh),
+  'ComponentState.showDom': ComponentStateViewStates.wrapCommand(ShowDom.showDom),
 }
 
 export const commandMap = {
@@ -21,6 +27,8 @@ export const commandMap = {
   'ComponentState.dispose': ComponentStateViewStates.dispose,
   'ComponentState.exists': FileSystem.exists,
   'ComponentState.getCommandIds': ComponentStateViewStates.getCommandIds,
+  'ComponentState.getMenuEntries': GetMenuEntries.getMenuEntries,
+  'ComponentState.getMenuEntryIds': GetMenuEntryIds.getMenuEntryIds,
   ...viewCommandMap,
   'ComponentState.isReadonly': FileSystem.isReadonly,
   'ComponentState.loadContent': ComponentStateViewStates.wrapCommand(LoadContent.loadContent),

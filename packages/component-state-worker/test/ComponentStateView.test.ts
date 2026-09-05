@@ -18,6 +18,8 @@ jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
 }))
 
 const { RendererWorker } = await import('@lvce-editor/rpc-registry')
+const { handleContextMenu } = await import('../src/parts/HandleContextMenu/HandleContextMenu.ts')
+const { showDom } = await import('../src/parts/ShowDom/ShowDom.ts')
 const { handleClick } = await import('../src/parts/HandleClick/HandleClick.ts')
 const { loadContent } = await import('../src/parts/LoadContent/LoadContent.ts')
 const { refresh } = await import('../src/parts/Refresh/Refresh.ts')
@@ -134,7 +136,7 @@ test('renders editable and unavailable component cards', () => {
 
   expect(dom).toContainEqual(expect.objectContaining({ childCount: 1, className: 'ComponentStateRows' }))
   expect(dom).toContainEqual(expect.objectContaining({ childCount: 2, className: 'ComponentStateRow' }))
-  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '1', disabled: false }))
+  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '1', disabled: false, onContextMenu: 3 }))
   expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '2', disabled: true }))
   expect(renderEventListeners()).toEqual([
     {
@@ -145,6 +147,11 @@ test('renders editable and unavailable component cards', () => {
     {
       name: 2,
       params: ['refresh'],
+      preventDefault: true,
+    },
+    {
+      name: 3,
+      params: ['handleContextMenu', 'event.currentTarget.dataset.uid', 'event.clientX', 'event.clientY'],
       preventDefault: true,
     },
   ])
@@ -191,4 +198,27 @@ test('splits component cards into rows for the available width', () => {
     expect.objectContaining({ childCount: 2 }),
     expect.objectContaining({ childCount: 1 }),
   ])
+})
+
+test('opens a context menu for the right-clicked component without opening its state', async () => {
+  create(7, 0, 0, 100, 100)
+  const state = { ...ComponentStateViewStates.get(7).newState, components: [{ editable: true, moduleId: 'Explorer', uid: 0.25 }] }
+  await expect(handleContextMenu(state, '0.25', 120, 240)).resolves.toBe(state)
+  expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
+  expect(RendererWorker.invoke).toHaveBeenCalledWith('ContextMenu.show2', 7, 34, 120, 240, { componentUid: 0.25 })
+})
+
+test('ignores unavailable or unknown context-menu targets', async () => {
+  create(7, 0, 0, 100, 100)
+  const state = { ...ComponentStateViewStates.get(7).newState, components: [{ editable: false, moduleId: 'Editor', uid: 9 }] }
+  await expect(handleContextMenu(state, '9', 0, 0)).resolves.toBe(state)
+  await expect(handleContextMenu(state, '10', 0, 0)).resolves.toBe(state)
+  expect(RendererWorker.invoke).not.toHaveBeenCalled()
+})
+
+test('opens the selected component DOM uri', async () => {
+  create(7, 0, 0, 100, 100)
+  const state = ComponentStateViewStates.get(7).newState
+  await expect(showDom(state, 0.25)).resolves.toBe(state)
+  expect(RendererWorker.invoke).toHaveBeenCalledWith('Main.openUri', 'live-component-state:///dom/0.25.json')
 })
