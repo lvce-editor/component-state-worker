@@ -7,6 +7,6 @@
     "dev": "node ../../node_modules/@lvce-editor/server/bin/server.js --link=../../.tmp/dist --test-path=../e2e"
   },
   "dependencies": {
-    "@lvce-editor/server": "0.113.10"
+    "@lvce-editor/server": "0.113.12"
   }
 }
