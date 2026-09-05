@@ -18,7 +18,8 @@ export const test: Test = async ({ Command, DragAndDrop, Editor, expect, FileSys
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   await Workspace.setPath(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
-  await expect(Locator('.Explorer')).toBeVisible()
+  const explorerView = Locator('.Explorer')
+  await expect(explorerView).toBeVisible()
   await Command.execute('Developer.openComponentState')
 
   const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
@@ -37,19 +38,22 @@ export const test: Test = async ({ Command, DragAndDrop, Editor, expect, FileSys
   const uri = `live-component-state:///${explorer.uid}.json`
   if (
     dragData.items.length !== 2 ||
-    !dragData.items.some((item) => item.type === 'text/uri-list' && item.data === uri) ||
-    !dragData.items.some((item) => item.type === 'text/plain' && item.data === uri)
+    dragData.items.every((item) => item.type !== 'text/uri-list' || item.data !== uri) ||
+    dragData.items.every((item) => item.type !== 'text/plain' || item.data !== uri)
   ) {
     throw new Error(`Expected component URI drag data, got ${JSON.stringify(dragData)}`)
   }
-  await expect(Locator('.Editor')).toHaveCount(0)
+  const editor = Locator('.Editor')
+  await expect(editor).toHaveCount(0)
   const dropId = await DragAndDrop.createDropSession(dragData.items.map((item) => ({ kind: 'string', type: item.type, value: item.data })))
   await Command.execute('Main.handleDrop', dropId)
 
-  await expect(Locator('.MainTabSelected .TabTitle')).toHaveText(`${explorer.uid}.json`)
-  await expect(Locator('.Editor')).toBeVisible()
+  const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
+  await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
+  await expect(editor).toBeVisible()
   const state = JSON.parse(await Editor.getText())
-  if (state.uid !== explorer.uid) {
-    throw new Error(`Expected state uid ${explorer.uid}, got ${state.uid}`)
+  const { uid } = state
+  if (uid !== explorer.uid) {
+    throw new Error(`Expected state uid ${explorer.uid}, got ${uid}`)
   }
 }

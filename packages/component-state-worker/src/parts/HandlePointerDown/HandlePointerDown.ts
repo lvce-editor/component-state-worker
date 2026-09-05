@@ -5,7 +5,8 @@ export const handlePointerDown = (state: ComponentStateViewState, button: number
   if (button !== 0) {
     return state
   }
-  const component = state.components.find((item) => item.uid === Number(uid) && item.editable)
+  const { components } = state
+  const component = components.find((item) => item.uid === Number(uid) && item.editable)
   return {
     ...state,
     dragUri: component ? LiveComponentStateUri.toUri(component.uid) : '',
