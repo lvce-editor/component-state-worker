@@ -8,6 +8,12 @@ Editor.
 
 ## Development
 
+Open the repository in a devcontainer to use Node.js 24 with dependencies
+installed and the development server started automatically. Port 3000 is
+forwarded for browser access.
+
+To develop locally:
+
 ```sh
 npm ci
 npm run dev

@@ -1,0 +1,13 @@
+{
+  "name": "component-state-worker",
+  "image": "mcr.microsoft.com/devcontainers/node:24",
+  "postCreateCommand": "npm ci",
+  "postStartCommand": "npm run dev",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  },
+  "forwardPorts": [3000],
+  "remoteUser": "node"
+}
