@@ -16,7 +16,7 @@ export const name = 'component-state-view.extension-view-state'
 // Requires lvce-editor with @lvce-editor/extension-management-worker >= 4.71.0.
 export const skip = 1
 
-export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extension, Locator, Main }) => {
+export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extension, Locator }) => {
   const uri = import.meta.resolve('../fixtures/sample.stateful-extension-view')
   await Extension.addWebExtension(uri)
   await ActivityBar.toggleActivityBarItem('sample.views.stateful')
@@ -35,8 +35,10 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
   await expect(extensionViewCard).toBeVisible()
   await expect(extensionViewCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
 
-  const stateUri = `live-component-state:///${extensionView.uid}.json`
-  await Main.openUri(stateUri)
+  // eslint-disable-next-line e2e/no-direct-click -- verifies that the extension component card opens its live JSON editor
+  await extensionViewCard.click()
+  const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
+  await expect(selectedTabTitle).toHaveText(`${extensionView.uid}.json`)
   const state = JSON.parse(await Editor.getText()) as ExtensionViewState
   const { count: initialCount } = state
   if (initialCount !== 1) {
@@ -44,7 +46,6 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
   }
 
   await Editor.setText(`${JSON.stringify({ ...state, count: 2 }, null, 2)}\n`)
-  await Main.save()
 
   const updatedCount = Locator('text=Extension count: 2')
   await expect(updatedCount).toBeVisible()
