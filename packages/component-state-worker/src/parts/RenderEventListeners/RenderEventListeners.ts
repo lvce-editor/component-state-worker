@@ -11,4 +11,9 @@ export const renderEventListeners = (): readonly any[] => [
     params: ['refresh'],
     preventDefault: true,
   },
+  {
+    name: DomEventListenerFunctions.HandleContextMenu,
+    params: ['handleContextMenu', 'event.currentTarget.dataset.uid', 'event.clientX', 'event.clientY'],
+    preventDefault: true,
+  },
 ]

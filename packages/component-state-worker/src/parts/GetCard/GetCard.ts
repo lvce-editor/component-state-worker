@@ -30,6 +30,7 @@ export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => 
       'data-uid': String(component.uid),
       disabled: !component.editable,
       onClick: DomEventListenerFunctions.HandleClick,
+      onContextMenu: DomEventListenerFunctions.HandleContextMenu,
       type: VirtualDomElements.Button,
     },
     titleNode,
