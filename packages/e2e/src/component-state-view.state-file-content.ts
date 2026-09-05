@@ -32,7 +32,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
     throw new Error(`Expected an Explorer state schema URI, got ${JSON.stringify($schema)}`)
   }
   const schema = JSON.parse(await FileSystem.readFile($schema))
-  if (schema.properties?.focusedIndex?.type !== 'integer') {
+  if (schema.properties?.focusedIndex?.type !== 'number') {
     throw new Error(`Expected the Explorer schema to describe focusedIndex, got ${JSON.stringify(schema)}`)
   }
   if (JSON.stringify(componentState) !== JSON.stringify(liveState)) {
