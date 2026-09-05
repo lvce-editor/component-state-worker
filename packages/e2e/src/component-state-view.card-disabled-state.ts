@@ -23,5 +23,6 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
     const state = component.editable ? 'enabled' : 'disabled'
     const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]:${state}`)
     await expect(card).toHaveCount(1)
+    await expect(card).toHaveAttribute('draggable', String(component.editable))
   }
 }

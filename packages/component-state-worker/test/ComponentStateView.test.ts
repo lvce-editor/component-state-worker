@@ -5,6 +5,7 @@ import { create } from '../src/parts/Create/Create.ts'
 import { diff2 } from '../src/parts/Diff2/Diff2.ts'
 import { getColumnCount } from '../src/parts/GetColumnCount/GetColumnCount.ts'
 import { getComponentStateVirtualDom } from '../src/parts/GetComponentStateVirtualDom/GetComponentStateVirtualDom.ts'
+import { handlePointerDown } from '../src/parts/HandlePointerDown/HandlePointerDown.ts'
 import { render2 } from '../src/parts/Render2/Render2.ts'
 import { renderEventListeners } from '../src/parts/RenderEventListeners/RenderEventListeners.ts'
 import { resize } from '../src/parts/Resize/Resize.ts'
@@ -136,8 +137,10 @@ test('renders editable and unavailable component cards', () => {
 
   expect(dom).toContainEqual(expect.objectContaining({ childCount: 1, className: 'ComponentStateRows' }))
   expect(dom).toContainEqual(expect.objectContaining({ childCount: 2, className: 'ComponentStateRow' }))
-  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '1', disabled: false, onContextMenu: 3 }))
-  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '2', disabled: true }))
+  expect(dom).toContainEqual(
+    expect.objectContaining({ 'data-uid': '1', disabled: false, draggable: true, onContextMenu: 3, onDragStart: 5, onPointerDown: 4 }),
+  )
+  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '2', disabled: true, draggable: false }))
   expect(renderEventListeners()).toEqual([
     {
       name: 1,
@@ -153,6 +156,14 @@ test('renders editable and unavailable component cards', () => {
       name: 3,
       params: ['handleContextMenu', 'event.currentTarget.dataset.uid', 'event.clientX', 'event.clientY'],
       preventDefault: true,
+    },
+    {
+      name: 4,
+      params: ['handlePointerDown', 'event.button', 'event.currentTarget.dataset.uid'],
+    },
+    {
+      name: 5,
+      params: [],
     },
   ])
 })
@@ -221,4 +232,51 @@ test('opens the selected component DOM uri', async () => {
   const state = ComponentStateViewStates.get(7).newState
   await expect(showDom(state, 0.25)).resolves.toBe(state)
   expect(RendererWorker.invoke).toHaveBeenCalledWith('Main.openUri', 'live-component-state:///dom/0.25.json')
+})
+
+test('prepares the pointed component URI without opening or rerendering the cards', () => {
+  create(7, 0, 0, 100, 100)
+  const initial = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: [
+      { editable: true, moduleId: 'Explorer', uid: 0.25 },
+      { editable: true, moduleId: 'Search', uid: 42 },
+    ],
+  }
+  let state = initial
+  for (const uid of ['0.25', '42', '0.25']) {
+    const next = handlePointerDown(state, 0, uid)
+    ComponentStateViewStates.set(7, state, next, next)
+    expect(diff2(7)).toEqual([2])
+    expect(render2(7, [2])).toEqual([
+      [
+        'Viewlet.setDragData',
+        7,
+        {
+          items: [
+            { data: `live-component-state:///${uid}.json`, type: 'text/uri-list' },
+            { data: `live-component-state:///${uid}.json`, type: 'text/plain' },
+          ],
+        },
+      ],
+    ])
+    state = next
+  }
+  expect(RendererWorker.invoke).not.toHaveBeenCalled()
+})
+
+test('ignores secondary pointer buttons and clears drag data for unavailable or unknown components', () => {
+  create(7, 0, 0, 100, 100)
+  const state = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: [{ editable: false, moduleId: 'Editor', uid: 9 }],
+    dragUri: 'live-component-state:///42.json',
+  }
+  expect(handlePointerDown(state, 2, '9')).toBe(state)
+  for (const uid of ['9', '10']) {
+    const next = handlePointerDown(state, 0, uid)
+    ComponentStateViewStates.set(7, state, next, next)
+    expect(diff2(7)).toEqual([2])
+    expect(render2(7, [2])).toEqual([['Viewlet.setDragData', 7, { items: [] }]])
+  }
 })

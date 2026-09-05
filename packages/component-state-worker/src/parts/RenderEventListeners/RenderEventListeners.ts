@@ -16,4 +16,12 @@ export const renderEventListeners = (): readonly any[] => [
     params: ['handleContextMenu', 'event.currentTarget.dataset.uid', 'event.clientX', 'event.clientY'],
     preventDefault: true,
   },
+  {
+    name: DomEventListenerFunctions.HandlePointerDown,
+    params: ['handlePointerDown', 'event.button', 'event.currentTarget.dataset.uid'],
+  },
+  {
+    name: DomEventListenerFunctions.HandleDragStart,
+    params: [],
+  },
 ]
