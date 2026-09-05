@@ -1,12 +1,12 @@
 interface JsonSchema {
   readonly $id?: string
   readonly $schema?: string
-  readonly additionalProperties?: boolean
+  readonly additionalProperties?: boolean | JsonSchema
   readonly properties?: Readonly<Record<string, JsonSchema>>
   readonly type?: string
 }
 
-const createValueSchema = (value: unknown): JsonSchema => {
+const createValueSchema = (value: unknown, propertyName = ''): JsonSchema => {
   if (value === null) {
     return { type: 'null' }
   }
@@ -19,12 +19,15 @@ const createValueSchema = (value: unknown): JsonSchema => {
     case 'number':
       return { type: Number.isSafeInteger(value) ? 'integer' : 'number' }
     case 'object':
+      if (propertyName === 'fileIconCache') {
+        return { additionalProperties: { type: 'string' }, type: 'object' }
+      }
       return {
         additionalProperties: false,
         properties: Object.fromEntries(
           Object.entries(value)
             .filter((entry) => entry[1] !== undefined)
-            .map(([key, child]) => [key, createValueSchema(child)]),
+            .map(([key, child]) => [key, createValueSchema(child, key)]),
         ),
         type: 'object',
       }
