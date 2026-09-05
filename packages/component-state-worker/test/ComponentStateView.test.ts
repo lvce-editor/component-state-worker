@@ -205,7 +205,7 @@ test('opens a context menu for the right-clicked component without opening its s
   const state = { ...ComponentStateViewStates.get(7).newState, components: [{ editable: true, moduleId: 'Explorer', uid: 0.25 }] }
   await expect(handleContextMenu(state, '0.25', 120, 240)).resolves.toBe(state)
   expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
-  expect(RendererWorker.invoke).toHaveBeenCalledWith('ContextMenu.show2', 7, 34, 120, 240, { componentUid: 0.25 })
+  expect(RendererWorker.invoke).toHaveBeenCalledWith('ContextMenu.show2', 7, 34, 120, 240, { componentUid: 0.25, domAvailable: true })
 })
 
 test('ignores unavailable or unknown context-menu targets', async () => {
