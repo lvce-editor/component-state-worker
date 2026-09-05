@@ -32,7 +32,7 @@ beforeEach(() => {
 })
 
 test('creates, loads, diffs, and renders the component rows', async () => {
-  const components = [{ editable: true, moduleId: 'Explorer', uid: 9 }]
+  const components = [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 }]
   jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
   create(7, 1, 2, 300, 400)
   const initial = ComponentStateViewStates.get(7).newState
@@ -46,8 +46,8 @@ test('creates, loads, diffs, and renders the component rows', async () => {
 
 test('hides unavailable components by default', async () => {
   const components = [
-    { editable: true, moduleId: 'Explorer', uid: 9 },
-    { editable: false, moduleId: 'Editor', uid: 10 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
   ]
   jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
@@ -60,8 +60,8 @@ test('hides unavailable components by default', async () => {
 
 test('shows unavailable components when configured', async () => {
   const components = [
-    { editable: true, moduleId: 'Explorer', uid: 9 },
-    { editable: false, moduleId: 'Editor', uid: 10 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
   ]
   jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(true)
@@ -72,8 +72,11 @@ test('shows unavailable components when configured', async () => {
 })
 
 test('refreshes the live component list', async () => {
-  const initialComponents = [{ editable: true, moduleId: 'Explorer', uid: 9 }]
-  const refreshedComponents = [...initialComponents, { editable: true, moduleId: 'Search', uid: 10 }]
+  const initialComponents = [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 }]
+  const refreshedComponents = [
+    ...initialComponents,
+    { displayName: 'Search', domAvailable: true, editable: true, moduleId: 'Search', uid: 10 },
+  ]
   jest.mocked(RendererWorker.getComponents).mockResolvedValue(refreshedComponents)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
   create(7, 1, 2, 300, 400)
@@ -131,8 +134,8 @@ test('rerenders only when resizing changes the column count', () => {
 
 test('renders editable and unavailable component cards', () => {
   const components = [
-    { editable: true, moduleId: 'Explorer', uid: 1 },
-    { editable: false, moduleId: 'Editor', uid: 2 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 1 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 2 },
   ]
   const dom = getComponentStateVirtualDom(components, true, 400)
 
@@ -171,10 +174,10 @@ test('renders editable and unavailable component cards', () => {
 
 test('renders distinct extension display names and falls back to module ids', () => {
   const components = [
-    { displayName: 'Hetzner (extension)', editable: true, moduleId: 'ExtensionView', uid: 1 },
-    { displayName: 'Notes (extension)', editable: true, moduleId: 'ExtensionView', uid: 2 },
-    { editable: true, moduleId: 'Explorer', uid: 3 },
-    { displayName: '', editable: false, moduleId: 'Editor', uid: 4 },
+    { displayName: 'Hetzner (extension)', domAvailable: true, editable: true, moduleId: 'ExtensionView', uid: 1 },
+    { displayName: 'Notes (extension)', domAvailable: true, editable: true, moduleId: 'ExtensionView', uid: 2 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 3 },
+    { displayName: '', domAvailable: true, editable: false, moduleId: 'Editor', uid: 4 },
   ]
   const dom = getComponentStateVirtualDom(components, true, 400)
   const titles = dom.flatMap((node, index) => (node.className === 'ComponentStateCardTitle' ? [dom[index + 1].text] : []))
@@ -199,9 +202,9 @@ test('renders the loading state before components are available', () => {
 
 test('splits component cards into rows for the available width', () => {
   const components = [
-    { editable: true, moduleId: 'Explorer', uid: 1 },
-    { editable: true, moduleId: 'Editor', uid: 2 },
-    { editable: true, moduleId: 'Source Control', uid: 3 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 1 },
+    { displayName: 'Editor', domAvailable: true, editable: true, moduleId: 'Editor', uid: 2 },
+    { displayName: 'Source Control', domAvailable: true, editable: true, moduleId: 'Source Control', uid: 3 },
   ]
 
   const dom = getComponentStateVirtualDom(components, true, 400)
@@ -214,7 +217,10 @@ test('splits component cards into rows for the available width', () => {
 
 test('opens a context menu for the right-clicked component without opening its state', async () => {
   create(7, 0, 0, 100, 100)
-  const state = { ...ComponentStateViewStates.get(7).newState, components: [{ editable: true, moduleId: 'Explorer', uid: 0.25 }] }
+  const state = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 0.25 }],
+  }
   await expect(handleContextMenu(state, '0.25', 120, 240)).resolves.toBe(state)
   expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
   expect(RendererWorker.invoke).toHaveBeenCalledWith('ContextMenu.show2', 7, 34, 120, 240, { componentUid: 0.25, domAvailable: true })
@@ -222,7 +228,10 @@ test('opens a context menu for the right-clicked component without opening its s
 
 test('ignores unavailable or unknown context-menu targets', async () => {
   create(7, 0, 0, 100, 100)
-  const state = { ...ComponentStateViewStates.get(7).newState, components: [{ editable: false, moduleId: 'Editor', uid: 9 }] }
+  const state = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: [{ displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 9 }],
+  }
   await expect(handleContextMenu(state, '9', 0, 0)).resolves.toBe(state)
   await expect(handleContextMenu(state, '10', 0, 0)).resolves.toBe(state)
   expect(RendererWorker.invoke).not.toHaveBeenCalled()
@@ -240,8 +249,8 @@ test('prepares the pointed component URI without opening or rerendering the card
   const initial = {
     ...ComponentStateViewStates.get(7).newState,
     components: [
-      { editable: true, moduleId: 'Explorer', uid: 0.25 },
-      { editable: true, moduleId: 'Search', uid: 42 },
+      { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 0.25 },
+      { displayName: 'Search', domAvailable: true, editable: true, moduleId: 'Search', uid: 42 },
     ],
   }
   let state: ComponentStateViewState = initial
@@ -270,7 +279,7 @@ test('ignores secondary pointer buttons and clears drag data for unavailable or 
   create(7, 0, 0, 100, 100)
   const state = {
     ...ComponentStateViewStates.get(7).newState,
-    components: [{ editable: false, moduleId: 'Editor', uid: 9 }],
+    components: [{ displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 9 }],
     dragUri: 'live-component-state:///42.json',
   }
   expect(handlePointerDown(state, 2, '9')).toBe(state)
