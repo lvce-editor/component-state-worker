@@ -24,18 +24,27 @@ export const test: Test = async ({ Command, DragAndDrop, Editor, expect, FileSys
 
   const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
   const explorer = components.find((component) => component.moduleId === 'Explorer')
-  const view = components.find((component) => component.moduleId === 'ComponentState')
-  if (!explorer?.editable || !view) {
-    throw new Error(`Expected Explorer and ComponentState components, got ${JSON.stringify(components)}`)
+  if (!explorer?.editable) {
+    throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
   }
   const card = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(card).toHaveAttribute('draggable', 'true')
   // Start on a child to verify that the card supplies the component UID.
   await card.locator('.ComponentStateCardTitle').dispatchEvent('pointerdown', { bubbles: true, button: 0 } as any)
-  // Wait for the view's queued pointer event and rendering to finish.
-  await Command.execute('Viewlet.executeViewletCommand', view.uid, 'refresh')
-  const dragData = (await Command.execute('Viewlet.getDragData')) as DragData
+  // DOM event dispatch finishes before the worker has rendered its drag payload.
   const uri = `live-component-state:///${explorer.uid}.json`
+  const deadline = Date.now() + 5000
+  let dragData: DragData | undefined
+  while (Date.now() < deadline) {
+    const current = (await Command.execute('Viewlet.getDragData')) as DragData | null
+    if (current?.items.some((item) => item.type === 'text/uri-list' && item.data === uri)) {
+      dragData = current
+      break
+    }
+  }
+  if (!dragData) {
+    throw new Error(`Timed out waiting for component URI drag data: ${uri}`)
+  }
   if (
     dragData.items.length !== 2 ||
     dragData.items.every((item) => item.type !== 'text/uri-list' || item.data !== uri) ||
