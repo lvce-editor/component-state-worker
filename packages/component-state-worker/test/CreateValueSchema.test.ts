@@ -120,13 +120,16 @@ test('recognizes fileIconCache inside nested objects', () => {
   })
 })
 
-test.each(['', 'icons', 'FileIconCache', 'fileIconCacheExtra'])('infers ordinary object properties for property name %j', (propertyName) => {
-  expect(CreateValueSchema.createValueSchema({ file: '/file.svg' }, propertyName)).toEqual({
-    additionalProperties: true,
-    properties: { file: { type: 'string' } },
-    type: 'object',
-  })
-})
+test.each(['', 'icons', 'FileIconCache', 'fileIconCacheExtra'])(
+  'infers ordinary object properties for property name %j',
+  (propertyName) => {
+    expect(CreateValueSchema.createValueSchema({ file: '/file.svg' }, propertyName)).toEqual({
+      additionalProperties: true,
+      properties: { file: { type: 'string' } },
+      type: 'object',
+    })
+  },
+)
 
 test.each([
   { type: 'null', value: null },
@@ -142,8 +145,8 @@ test('ignores inherited, non-enumerable, and symbol properties', () => {
   const value = Object.create({ inherited: 1 })
   Object.defineProperties(value, {
     hidden: { value: true },
-    visible: { enumerable: true, value: 'hello' },
     [Symbol('symbol')]: { enumerable: true, value: 1 },
+    visible: { enumerable: true, value: 'hello' },
   })
 
   expect(CreateValueSchema.createValueSchema(value)).toEqual({
