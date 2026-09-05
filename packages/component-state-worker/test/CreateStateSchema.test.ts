@@ -19,15 +19,15 @@ test('infers JSON schema property types recursively', () => {
   ).toEqual({
     $id: 'live-component-state:///schemas/7.json',
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    additionalProperties: false,
+    additionalProperties: true,
     properties: {
       $schema: { type: 'string' },
       array: { type: 'array' },
       boolean: { type: 'boolean' },
       float: { type: 'number' },
-      integer: { type: 'integer' },
+      integer: { type: 'number' },
       nested: {
-        additionalProperties: false,
+        additionalProperties: true,
         properties: {
           label: { type: 'string' },
         },
@@ -38,4 +38,12 @@ test('infers JSON schema property types recursively', () => {
     },
     type: 'object',
   })
+})
+
+test('keeps snapshot schemas open to fractional values and properties added later', () => {
+  const schema = CreateStateSchema.createStateSchema({ height: 652, stats: {} }, 'live-component-state:///schemas/8.json')
+
+  expect(schema.properties?.height).toEqual({ type: 'number' })
+  expect(schema.additionalProperties).toBe(true)
+  expect(schema.properties?.stats.additionalProperties).toBe(true)
 })

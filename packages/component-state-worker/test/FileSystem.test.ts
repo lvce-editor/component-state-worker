@@ -43,13 +43,13 @@ test('creates a schema for component state on demand', async () => {
   expect(JSON.parse(content)).toEqual({
     $id: 'live-component-state:///schemas/7.json',
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    additionalProperties: false,
+    additionalProperties: true,
     properties: {
       $schema: { type: 'string' },
       focused: { type: 'boolean' },
-      focusedIndex: { type: 'integer' },
+      focusedIndex: { type: 'number' },
       labels: { type: 'array' },
-      uid: { type: 'integer' },
+      uid: { type: 'number' },
     },
     type: 'object',
   })
