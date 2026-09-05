@@ -17,10 +17,12 @@ const createValueSchema = (value: unknown): JsonSchema => {
     case 'boolean':
       return { type: 'boolean' }
     case 'number':
-      return { type: Number.isSafeInteger(value) ? 'integer' : 'number' }
+      // A snapshot cannot establish whether future numeric values are integers.
+      return { type: 'number' }
     case 'object':
       return {
-        additionalProperties: false,
+        // Components may add properties after this snapshot is taken.
+        additionalProperties: true,
         properties: Object.fromEntries(
           Object.entries(value)
             .filter((entry) => entry[1] !== undefined)

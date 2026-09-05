@@ -24,15 +24,15 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
 
   await Main.closeAllEditors()
   await Main.openUri(`live-component-state:///${explorer.uid}.json`)
-  await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "unknown": true\n}\n`)
+  await Editor.setText(`{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "focusedIndex": "first"\n}\n`)
   const editorId = (await Command.execute('GetActiveEditor.getActiveEditorId')) as number
   await Editor.shouldHaveDiagnosticProviderResult(
     [
       {
-        columnIndex: 2,
-        endColumnIndex: 11,
+        columnIndex: 18,
+        endColumnIndex: 25,
         endRowIndex: 2,
-        message: 'Property "unknown" is not allowed.',
+        message: 'Incorrect type. Expected "number" but received "string".',
         rowIndex: 2,
         source: 'json (schema_validation)',
         type: 'error',
@@ -40,4 +40,9 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
     ],
     editorId,
   )
+
+  await Editor.setText(
+    `{\n  "$schema": "live-component-state:///schemas/${explorer.uid}.json",\n  "height": 652.55078125,\n  "scrollBarY": 0\n}\n`,
+  )
+  await Editor.shouldHaveDiagnosticProviderResult([], editorId)
 }
