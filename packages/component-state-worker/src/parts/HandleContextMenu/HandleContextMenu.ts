@@ -10,9 +10,13 @@ export const handleContextMenu = async (
 ): Promise<ComponentStateViewState> => {
   const { components, uid: viewUid } = state
   const componentUid = Number(uid)
-  if (components.every((component) => !(component.uid === componentUid && component.editable))) {
+  const component = components.find((item) => item.uid === componentUid && item.editable)
+  if (!component) {
     return state
   }
-  await RendererWorker.invoke('ContextMenu.show2', viewUid, MenuEntryId.ComponentState, x, y, { componentUid })
+  await RendererWorker.invoke('ContextMenu.show2', viewUid, MenuEntryId.ComponentState, x, y, {
+    componentUid,
+    domAvailable: component.domAvailable !== false,
+  })
   return state
 }

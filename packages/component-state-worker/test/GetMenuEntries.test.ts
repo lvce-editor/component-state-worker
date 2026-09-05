@@ -8,3 +8,7 @@ test('offers Show Dom for the component passed by the card', () => {
     { args: [0.25], command: 'ComponentState.showDom', flags: 0, id: 'showDom', label: 'Show Dom' },
   ])
 })
+
+test('disables DOM inspection for components without a DOM API', () => {
+  expect(getMenuEntries(7, { componentUid: 9, domAvailable: false })[0]).toEqual(expect.objectContaining({ flags: 5, label: 'Show Dom' }))
+})
