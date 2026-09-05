@@ -16,7 +16,7 @@ export const handleContextMenu = async (
   }
   await RendererWorker.invoke('ContextMenu.show2', viewUid, MenuEntryId.ComponentState, x, y, {
     componentUid,
-    domAvailable: component.domAvailable !== false,
+    domAvailable: component.domAvailable,
   })
   return state
 }

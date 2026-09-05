@@ -86,8 +86,8 @@ test('rejects invalid component state uris', async () => {
 
 test('lists only editable live components', async () => {
   jest.mocked(RendererWorker.getComponents).mockResolvedValue([
-    { editable: true, moduleId: 'Explorer', uid: 7 },
-    { editable: false, moduleId: 'Editor', uid: 8 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 7 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 8 },
   ])
 
   await expect(FileSystem.readDirWithFileTypes()).resolves.toEqual([{ name: '7.json', type: 7 }])
@@ -95,8 +95,8 @@ test('lists only editable live components', async () => {
 
 test('checks whether an editable component exists', async () => {
   jest.mocked(RendererWorker.getComponents).mockResolvedValue([
-    { editable: true, moduleId: 'Explorer', uid: 7 },
-    { editable: false, moduleId: 'Editor', uid: 8 },
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 7 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 8 },
   ])
 
   await expect(FileSystem.exists('live-component-state:///7.json')).resolves.toBe(true)
@@ -116,7 +116,9 @@ test('reads formatted virtual DOM without registering a state editor listener', 
 })
 
 test('treats DOM files as read-only and checks the component exists', async () => {
-  jest.mocked(RendererWorker.getComponents).mockResolvedValue([{ editable: true, moduleId: 'Explorer', uid: 7 }])
+  jest
+    .mocked(RendererWorker.getComponents)
+    .mockResolvedValue([{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 7 }])
   expect(FileSystem.isReadonly('live-component-state:///dom/7.json')).toBe(true)
   await expect(FileSystem.exists('live-component-state:///dom/7.json')).resolves.toBe(true)
   await expect(FileSystem.exists('live-component-state:///dom/8.json')).resolves.toBe(false)
