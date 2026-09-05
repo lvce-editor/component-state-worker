@@ -31,4 +31,8 @@ await writeFile(rendererWorkerPath, newContent)
 const workerTargetPath = join(root, 'dist', commitHash, 'packages', 'component-state-worker', 'dist', 'componentStateWorkerMain.js')
 await mkdir(dirname(workerTargetPath), { recursive: true })
 await cp(workerPath, workerTargetPath)
+await cp(
+  join(root, 'node_modules', '@lvce-editor', 'test-worker', 'dist', 'testWorkerMain.js'),
+  join(root, 'dist', commitHash, 'packages', 'test-worker', 'dist', 'testWorkerMain.js'),
+)
 await cp(join(root, 'dist'), join(root, '.tmp', 'static'), { recursive: true })
