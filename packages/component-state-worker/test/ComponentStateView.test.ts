@@ -150,6 +150,21 @@ test('renders editable and unavailable component cards', () => {
   ])
 })
 
+test('renders distinct extension display names and falls back to module ids', () => {
+  const components = [
+    { displayName: 'Hetzner (extension)', editable: true, moduleId: 'ExtensionView', uid: 1 },
+    { displayName: 'Notes (extension)', editable: true, moduleId: 'ExtensionView', uid: 2 },
+    { editable: true, moduleId: 'Explorer', uid: 3 },
+    { displayName: '', editable: false, moduleId: 'Editor', uid: 4 },
+  ]
+  const dom = getComponentStateVirtualDom(components, true, 400)
+  const titles = dom.flatMap((node, index) => (node.className === 'ComponentStateCardTitle' ? [dom[index + 1].text] : []))
+
+  expect(titles).toEqual(['Hetzner (extension)', 'Notes (extension)', 'Explorer', 'Editor'])
+  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '1', disabled: false }))
+  expect(dom).toContainEqual(expect.objectContaining({ 'data-uid': '2', disabled: false }))
+})
+
 test('renders a refresh action button', () => {
   const dom = getComponentStateVirtualDom([], true, 300)
 
