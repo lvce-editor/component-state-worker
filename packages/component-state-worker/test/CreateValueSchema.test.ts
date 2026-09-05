@@ -31,7 +31,7 @@ test.each([
   { label: 'undefined', value: undefined },
   { label: 'bigint', value: 1n },
   { label: 'symbol', value: Symbol('value') },
-  { label: 'function', value: () => 1 },
+  { label: 'function', value: (): number => 1 },
 ])('leaves $label unconstrained', ({ value }) => {
   expect(CreateValueSchema.createValueSchema(value)).toEqual({})
 })
@@ -140,9 +140,11 @@ test.each([
 
 test('ignores inherited, non-enumerable, and symbol properties', () => {
   const value = Object.create({ inherited: 1 })
-  Object.defineProperty(value, 'hidden', { value: true })
-  Object.defineProperty(value, 'visible', { enumerable: true, value: 'hello' })
-  Object.defineProperty(value, Symbol('symbol'), { enumerable: true, value: 1 })
+  Object.defineProperties(value, {
+    hidden: { value: true },
+    visible: { enumerable: true, value: 'hello' },
+    [Symbol('symbol')]: { enumerable: true, value: 1 },
+  })
 
   expect(CreateValueSchema.createValueSchema(value)).toEqual({
     additionalProperties: true,
