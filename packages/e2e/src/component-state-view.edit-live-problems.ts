@@ -41,11 +41,12 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
     `${JSON.stringify({ ...state, filterValue: 'live state filter', inputSource: 2, smallWidthBreakPoint: 10_000 }, null, 2)}\n`,
   )
 
+  const compactFilter = Locator('.Problems .InputBox')
+  await expect(compactFilter).toBeVisible()
+  await expect(compactFilter).toHaveValue('live state filter')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.filterValue !== 'live state filter') {
     throw new Error(`Expected Problems filter to update, got ${updatedState.filterValue}`)
   }
-  const compactFilter = Locator('.Problems .InputBox')
-  await expect(compactFilter).toBeVisible()
-  await expect(compactFilter).toHaveValue('live state filter')
 }

@@ -38,10 +38,11 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Loc
   }
   await Editor.setText(`${JSON.stringify({ ...state, name: 'Live State Extension' }, null, 2)}\n`)
 
+  await ExtensionDetail.open('builtin.language-features-json')
+  await expect(extensionName).toContainText('Live State Extension')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.name !== 'Live State Extension') {
     throw new Error(`Expected ExtensionDetail name to update, got ${updatedState.name}`)
   }
-  await ExtensionDetail.open('builtin.language-features-json')
-  await expect(extensionName).toContainText('Live State Extension')
 }

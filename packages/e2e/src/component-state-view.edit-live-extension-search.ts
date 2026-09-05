@@ -38,9 +38,10 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionSearch, Loc
   }
   await Editor.setText(`${JSON.stringify({ ...state, inputSource: 2, searchValue: '@disabled' }, null, 2)}\n`)
 
+  await expect(searchInput).toHaveValue('@disabled')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.searchValue !== '@disabled') {
     throw new Error(`Expected Extensions search value to update, got ${updatedState.searchValue}`)
   }
-  await expect(searchInput).toHaveValue('@disabled')
 }

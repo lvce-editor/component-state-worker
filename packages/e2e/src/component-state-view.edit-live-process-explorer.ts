@@ -39,11 +39,12 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   }
   await Editor.setText(`${JSON.stringify({ ...state, errorMessage: 'Live State Error' }, null, 2)}\n`)
 
+  await Command.execute('Developer.openProcessExplorer')
+  const errorMessage = Locator('.ProcessExplorerError')
+  await expect(errorMessage).toContainText('Live State Error')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.errorMessage !== 'Live State Error') {
     throw new Error(`Expected ProcessExplorer error message to update, got ${updatedState.errorMessage}`)
   }
-  await Command.execute('Developer.openProcessExplorer')
-  const errorMessage = Locator('.ProcessExplorerError')
-  await expect(errorMessage).toContainText('Live State Error')
 }

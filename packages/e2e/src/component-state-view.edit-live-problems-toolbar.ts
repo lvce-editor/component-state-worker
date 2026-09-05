@@ -42,9 +42,10 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   }
   await Editor.setText(`${JSON.stringify({ ...state, filterValue: 'live state filter', inputSource: 2 }, null, 2)}\n`)
 
+  await expect(filter).toHaveValue('live state filter')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.filterValue !== 'live state filter') {
     throw new Error(`Expected Problems filter to update, got ${updatedState.filterValue}`)
   }
-  await expect(filter).toHaveValue('live state filter')
 }

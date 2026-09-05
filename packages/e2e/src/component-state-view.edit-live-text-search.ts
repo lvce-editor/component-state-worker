@@ -38,9 +38,10 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings, S
   }
   await Editor.setText(`${JSON.stringify({ ...state, inputSource: 2, value: 'live state query' }, null, 2)}\n`)
 
+  await expect(searchInput).toHaveValue('live state query')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.value !== 'live state query') {
     throw new Error(`Expected Search value to update, got ${updatedState.value}`)
   }
-  await expect(searchInput).toHaveValue('live state query')
 }

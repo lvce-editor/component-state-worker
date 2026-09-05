@@ -41,10 +41,11 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   }
   await Editor.setText(`${JSON.stringify({ ...state, inputValue: 'Live browser state' }, null, 2)}\n`)
 
+  const addressInput = Locator('.SimpleBrowserHeader input.InputBox')
+  await expect(addressInput).toHaveValue('Live browser state')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.inputValue !== 'Live browser state') {
     throw new Error(`Expected SimpleBrowser input to update, got ${JSON.stringify(updatedState.inputValue)}`)
   }
-  const addressInput = Locator('.SimpleBrowserHeader input.InputBox')
-  await expect(addressInput).toHaveValue('Live browser state')
 }

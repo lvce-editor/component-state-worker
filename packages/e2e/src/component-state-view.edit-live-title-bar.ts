@@ -37,10 +37,11 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   }
   await Editor.setText(`${JSON.stringify({ ...state, title: 'Live State Title' }, null, 2)}\n`)
 
+  const title = Locator('.TitleBarTitle')
+  await expect(title).toHaveText('Live State Title')
+
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.title !== 'Live State Title') {
     throw new Error(`Expected TitleBar title to update, got ${updatedState.title}`)
   }
-  const title = Locator('.TitleBarTitle')
-  await expect(title).toHaveText('Live State Title')
 }
