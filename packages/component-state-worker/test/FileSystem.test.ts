@@ -107,21 +107,21 @@ test('checks whether an editable component exists', async () => {
   expect(FileSystem.canBeRestored).toBe(true)
 })
 
-test('reads formatted virtual DOM without registering a state editor listener', async () => {
+test('reads formatted virtual DOM and registers the editor listener', async () => {
   const dom = [{ childCount: 0, className: 'Explorer', type: VirtualDomElements.Div }]
   jest.mocked(RendererWorker.invoke).mockResolvedValue(dom)
   await expect(FileSystem.readFile('live-component-state:///dom/0.25.json')).resolves.toBe(`${JSON.stringify(dom, null, 2)}\n`)
   expect(RendererWorker.invoke).toHaveBeenCalledWith('ComponentState.getDom', 0.25)
-  expect(EditorWorker.invoke).not.toHaveBeenCalled()
 })
 
-test('treats DOM files as read-only and checks the component exists', async () => {
+test('treats DOM files as writable and checks the component exists', async () => {
   jest
     .mocked(RendererWorker.getComponents)
     .mockResolvedValue([{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 7 }])
-  expect(FileSystem.isReadonly('live-component-state:///dom/7.json')).toBe(true)
+  expect(FileSystem.isReadonly('live-component-state:///dom/7.json')).toBe(false)
   await expect(FileSystem.exists('live-component-state:///dom/7.json')).resolves.toBe(true)
   await expect(FileSystem.exists('live-component-state:///dom/8.json')).resolves.toBe(false)
-  await expect(FileSystem.writeFile('live-component-state:///dom/7.json', '[]')).rejects.toThrow('Invalid live component state URI')
-  expect(RendererWorker.invoke).not.toHaveBeenCalled()
+  const dom = [{ childCount: 0, type: VirtualDomElements.Div }]
+  await FileSystem.writeFile('live-component-state:///dom/7.json', JSON.stringify(dom))
+  expect(RendererWorker.invoke).toHaveBeenCalledWith('ComponentState.setDom', 7, dom)
 })
