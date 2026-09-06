@@ -16,6 +16,7 @@ const getNormalizedState = async (uid: number): Promise<Record<string, unknown>>
 
 export const readFile = async (uri: string): Promise<string> => {
   if (LiveComponentDomUri.is(uri)) {
+    await EditorChangeListener.register()
     const dom = await RendererWorker.invoke('ComponentState.getDom', LiveComponentDomUri.getUid(uri))
     return `${JSON.stringify(dom, null, 2)}\n`
   }
@@ -36,6 +37,12 @@ export const readFile = async (uri: string): Promise<string> => {
 }
 
 export const writeFile = async (uri: string, content: string): Promise<void> => {
+  if (LiveComponentDomUri.is(uri)) {
+    const dom: unknown = JSON.parse(content)
+    Assert.array(dom)
+    await RendererWorker.invoke('ComponentState.setDom', LiveComponentDomUri.getUid(uri), dom)
+    return
+  }
   const uid = LiveComponentStateUri.getUid(uri)
   const state: unknown = JSON.parse(content)
   Assert.object(state)
@@ -48,7 +55,7 @@ export const readDirWithFileTypes = async (): Promise<readonly { readonly name: 
   return components.filter((component) => component.editable).map((component) => ({ name: `${component.uid}.json`, type: DirentType.File }))
 }
 
-export const isReadonly = (uri = ''): boolean => LiveComponentStateSchemaUri.is(uri) || LiveComponentDomUri.is(uri)
+export const isReadonly = (uri = ''): boolean => LiveComponentStateSchemaUri.is(uri)
 
 export const exists = async (uri: string): Promise<boolean> => {
   const uriModule = [LiveComponentDomUri, LiveComponentStateSchemaUri].find((module) => module.is(uri)) || LiveComponentStateUri
