@@ -3,6 +3,7 @@ import type { ComponentStateViewState } from '../ComponentStateViewState/Compone
 import * as LiveComponentStateUri from '../LiveComponentStateUri/LiveComponentStateUri.ts'
 
 export const handleClick = async (state: ComponentStateViewState, uid: string): Promise<ComponentStateViewState> => {
-  await RendererWorker.invoke('Application.executeForView', state.uid, 'Main.openUri', LiveComponentStateUri.toUri(Number(uid)))
+  const { uid: viewUid } = state
+  await RendererWorker.invoke('Application.executeForView', viewUid, 'Main.openUri', LiveComponentStateUri.toUri(Number(uid)))
   return state
 }
