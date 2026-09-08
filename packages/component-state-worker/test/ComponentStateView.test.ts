@@ -33,7 +33,7 @@ beforeEach(() => {
 
 test('creates, loads, diffs, and renders the component rows', async () => {
   const components = [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 }]
-  jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
+  jest.mocked(RendererWorker.invoke).mockResolvedValue(components)
   create(7, 1, 2, 300, 400)
   const initial = ComponentStateViewStates.get(7).newState
   const loaded = await loadContent(initial)
@@ -49,7 +49,7 @@ test('hides unavailable components by default', async () => {
     { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
     { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
   ]
-  jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
+  jest.mocked(RendererWorker.invoke).mockResolvedValue(components)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
   create(7, 1, 2, 300, 400)
   const initial = ComponentStateViewStates.get(7).newState
@@ -63,7 +63,7 @@ test('shows unavailable components when configured', async () => {
     { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
     { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
   ]
-  jest.mocked(RendererWorker.getComponents).mockResolvedValue(components)
+  jest.mocked(RendererWorker.invoke).mockResolvedValue(components)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(true)
   create(7, 1, 2, 300, 400)
   const initial = ComponentStateViewStates.get(7).newState
@@ -77,7 +77,7 @@ test('refreshes the live component list', async () => {
     ...initialComponents,
     { displayName: 'Search', domAvailable: true, editable: true, moduleId: 'Search', uid: 10 },
   ]
-  jest.mocked(RendererWorker.getComponents).mockResolvedValue(refreshedComponents)
+  jest.mocked(RendererWorker.invoke).mockResolvedValue(refreshedComponents)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
   create(7, 1, 2, 300, 400)
   const initial = {
@@ -87,7 +87,7 @@ test('refreshes the live component list', async () => {
   }
 
   await expect(refresh(initial)).resolves.toMatchObject({ components: refreshedComponents, loaded: true })
-  expect(RendererWorker.getComponents).toHaveBeenCalledTimes(1)
+  expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
 })
 
 test('returns no diff or render commands for unchanged state', () => {
@@ -103,7 +103,7 @@ test('opens the selected component state uri', async () => {
   const state = ComponentStateViewStates.get(7).newState
 
   await expect(handleClick(state, '42')).resolves.toBe(state)
-  expect(invoke).toHaveBeenCalledWith('Main.openUri', 'live-component-state:///42.json')
+  expect(invoke).toHaveBeenCalledWith('Application.executeForView', 7, 'Main.openUri', 'live-component-state:///42.json')
 })
 
 test('resizes the view', () => {
@@ -241,7 +241,12 @@ test('opens the selected component DOM uri', async () => {
   create(7, 0, 0, 100, 100)
   const state = ComponentStateViewStates.get(7).newState
   await expect(showDom(state, 0.25)).resolves.toBe(state)
-  expect(RendererWorker.invoke).toHaveBeenCalledWith('Main.openUri', 'live-component-state:///dom/0.25.json')
+  expect(RendererWorker.invoke).toHaveBeenCalledWith(
+    'Application.executeForView',
+    7,
+    'Main.openUri',
+    'live-component-state:///dom/0.25.json',
+  )
 })
 
 test('prepares the pointed component URI without opening or rerendering the cards', () => {
@@ -288,5 +293,30 @@ test('ignores secondary pointer buttons and clears drag data for unavailable or 
     ComponentStateViewStates.set(7, state, next, next)
     expect(diff2(7)).toEqual([2])
     expect(render2(7, [2])).toEqual([['Viewlet.setDragData', 7, { items: [] }]])
+  }
+})
+
+test('keeps requests from two component inspectors tied to their own view', async () => {
+  jest.mocked(RendererWorker.invoke).mockResolvedValue([])
+  for (const uid of [100, 200, 100]) {
+    create(uid, 0, 0, 100, 100)
+    const state = ComponentStateViewStates.get(uid).newState
+    await loadContent(state)
+    expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.getComponents', uid)
+    await handleClick(state, String(uid + 1))
+    expect(RendererWorker.invoke).toHaveBeenLastCalledWith(
+      'Application.executeForView',
+      uid,
+      'Main.openUri',
+      `live-component-state:///${uid + 1}.json`,
+    )
+    await showDom(state, uid + 1)
+    expect(RendererWorker.invoke).toHaveBeenLastCalledWith(
+      'Application.executeForView',
+      uid,
+      'Main.openUri',
+      `live-component-state:///dom/${uid + 1}.json`,
+    )
+    ComponentStateViewStates.dispose(uid)
   }
 })
