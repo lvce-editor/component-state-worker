@@ -4,6 +4,5 @@ import * as RegisterCommands from '../RegisterCommands/RegisterCommands.ts'
 
 export const listen = async (): Promise<void> => {
   RegisterCommands.registerCommands()
-  await InitializeRendererWorker.initializeRendererWorker()
-  await InitializeEditorWorker.initializeEditorWorker()
+  await Promise.all([InitializeRendererWorker.initializeRendererWorker(), InitializeEditorWorker.initializeEditorWorker()])
 }
