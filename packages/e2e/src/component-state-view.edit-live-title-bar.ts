@@ -1,21 +1,15 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-title-bar'
 
-export const test: Test = async ({ Command, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const titleBar = Locator('.TitleBar')
   await expect(titleBar).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'TitleBar')
   if (!component?.editable) {
     throw new Error(`Expected an editable TitleBar component, got ${JSON.stringify(components)}`)
@@ -40,7 +34,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   const title = Locator('.TitleBarTitle')
   await expect(title).toHaveText('Live State Title')
 
-  const updatedState = await Command.execute('ComponentState.getState', component.uid)
+  const updatedState = await ComponentState.getState<{ readonly title: string }>(component.uid)
   if (updatedState.title !== 'Live State Title') {
     throw new Error(`Expected TitleBar title to update, got ${updatedState.title}`)
   }

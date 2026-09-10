@@ -1,22 +1,16 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-extension-detail'
 
-export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, ExtensionDetail, Locator, Settings }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   await ExtensionDetail.open('builtin.language-features-json')
   const extensionName = Locator('.ExtensionDetailName')
   await expect(extensionName).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'ExtensionDetail')
   if (!component?.editable) {
     throw new Error(`Expected an editable ExtensionDetail component, got ${JSON.stringify(components)}`)
@@ -41,7 +35,7 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Loc
   await ExtensionDetail.open('builtin.language-features-json')
   await expect(extensionName).toContainText('Live State Extension')
 
-  const updatedState = await Command.execute('ComponentState.getState', component.uid)
+  const updatedState = await ComponentState.getState<{ readonly name: string }>(component.uid)
   if (updatedState.name !== 'Live State Extension') {
     throw new Error(`Expected ExtensionDetail name to update, got ${updatedState.name}`)
   }

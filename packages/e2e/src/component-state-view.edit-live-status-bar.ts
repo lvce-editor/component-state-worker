@@ -1,21 +1,15 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-status-bar'
 
-export const test: Test = async ({ Command, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const statusBar = Locator('.StatusBar')
   await expect(statusBar).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'StatusBar')
   if (!component?.editable) {
     throw new Error(`Expected an editable StatusBar component, got ${JSON.stringify(components)}`)

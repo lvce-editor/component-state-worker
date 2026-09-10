@@ -1,23 +1,17 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.state-file-content'
 
-export const test: Test = async ({ Command, expect, FileSystem, Locator, Settings, Workspace }) => {
+export const test: Test = async ({ ComponentState, Developer, expect, FileSystem, Locator, Settings, SideBar, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   await Settings.update({ 'componentStateView.showUnavailableComponents': true })
   await Workspace.setPath(tmpDir)
-  await Command.execute('Layout.showSideBar', 'Explorer')
+  await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
-  await Command.execute('Developer.openComponentState')
+  const components = await ComponentState.getComponents()
+  await Developer.openComponentState()
 
   const explorer = components.find((component) => component.moduleId === 'Explorer')
   if (!explorer) {
@@ -27,7 +21,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Setting
   const content = await FileSystem.readFile(uri)
   const fileState = JSON.parse(content)
   const { $schema, ...componentState } = fileState
-  const liveState = await Command.execute('ComponentState.getState', explorer.uid)
+  const liveState = await ComponentState.getState(explorer.uid)
   if ($schema !== `live-component-state:///schemas/${explorer.uid}.json`) {
     throw new Error(`Expected an Explorer state schema URI, got ${JSON.stringify($schema)}`)
   }

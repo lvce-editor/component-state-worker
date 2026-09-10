@@ -1,11 +1,5 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 interface ExtensionViewState {
   readonly count: number
   readonly uid: number
@@ -16,7 +10,7 @@ export const name = 'component-state-view.extension-view-state'
 // Requires lvce-editor with @lvce-editor/extension-management-worker >= 4.71.0.
 export const skip = 1
 
-export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extension, Locator }) => {
+export const test: Test = async ({ ActivityBar, ComponentState, Developer, Editor, expect, Extension, Locator }) => {
   const uri = import.meta.resolve('../fixtures/sample.stateful-extension-view')
   await Extension.addWebExtension(uri)
   await ActivityBar.toggleActivityBarItem('sample.views.stateful')
@@ -24,13 +18,13 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
   const count = Locator('text=Extension count: 1')
   await expect(count).toBeVisible()
 
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const extensionView = components.find((component) => component.moduleId === 'ExtensionView' && component.editable)
   if (!extensionView) {
     throw new Error(`Expected an editable extension view component, got ${JSON.stringify(components)}`)
   }
 
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const extensionViewCard = Locator(`.ComponentStateCard[data-uid="${extensionView.uid}"]`)
   await expect(extensionViewCard).toBeVisible()
   await expect(extensionViewCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
@@ -49,7 +43,7 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
 
   const updatedCount = Locator('text=Extension count: 2')
   await expect(updatedCount).toBeVisible()
-  const updatedState = (await Command.execute('ComponentState.getState', extensionView.uid)) as ExtensionViewState
+  const updatedState = await ComponentState.getState<ExtensionViewState>(extensionView.uid)
   const { count: finalCount } = updatedState
   if (finalCount !== 2) {
     throw new Error(`Expected extension view count to be 2, got ${finalCount}`)
