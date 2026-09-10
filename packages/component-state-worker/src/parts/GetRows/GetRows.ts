@@ -4,7 +4,7 @@ import * as ClassNames from '../ClassNames/ClassNames.ts'
 import { getCard } from '../GetCard/GetCard.ts'
 
 export const getRows = (components: readonly ComponentInfo[], columnCount: number): readonly VirtualDomNode[] => {
-  const rows: ComponentInfo[][] = []
+  const rows: (readonly ComponentInfo[])[] = []
   for (let index = 0; index < components.length; index += columnCount) {
     rows.push(components.slice(index, index + columnCount))
   }
