@@ -42,7 +42,12 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await Editor.setText(`${JSON.stringify({ ...state, providerUnavailableMessage: 'Live source control message' }, null, 2)}\n`)
 
   const message = Locator('.SourceControl .Message')
-  await expect(message).toHaveText('Live source control message')
+  try {
+    await expect(message).toHaveText('Live source control message')
+  } catch (error) {
+    const currentState = await Command.execute('ComponentState.getState', component.uid)
+    throw new Error(`[DEBUG-source-control] snapshot=${JSON.stringify(state)} current=${JSON.stringify(currentState)} error=${error}`)
+  }
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
   if (updatedState.providerUnavailableMessage !== 'Live source control message') {

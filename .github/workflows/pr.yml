@@ -77,4 +77,5 @@ jobs:
         with:
           name: e2e-${{ matrix.os }}-${{ matrix.attempt }}
           path: .tmp
+          include-hidden-files: true
           if-no-files-found: ignore
