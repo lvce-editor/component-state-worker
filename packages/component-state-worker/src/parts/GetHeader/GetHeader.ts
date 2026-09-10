@@ -1,5 +1,6 @@
 import { AriaRoles, mergeClassNames, text, type VirtualDomNode, VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import * as ClassNames from '../ClassNames/ClassNames.ts'
+import * as ComponentStateStrings from '../ComponentStateStrings/ComponentStateStrings.ts'
 import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEventListenerFunctions.ts'
 
 const headerNode: VirtualDomNode = {
@@ -15,7 +16,6 @@ const headingNode: VirtualDomNode = {
 }
 
 const actionsNode: VirtualDomNode = {
-  ariaLabel: 'Live Component State actions',
   childCount: 1,
   className: ClassNames.HeaderActions,
   role: AriaRoles.ToolBar,
@@ -23,11 +23,9 @@ const actionsNode: VirtualDomNode = {
 }
 
 const refreshButtonNode: VirtualDomNode = {
-  ariaLabel: 'Refresh',
   childCount: 1,
   className: ClassNames.IconButton,
   onClick: DomEventListenerFunctions.HandleRefresh,
-  title: 'Refresh',
   type: VirtualDomElements.Button,
 }
 
@@ -40,8 +38,8 @@ const refreshIconNode: VirtualDomNode = {
 export const getHeader = (): readonly VirtualDomNode[] => [
   headerNode,
   headingNode,
-  text('Live Component State'),
-  actionsNode,
-  refreshButtonNode,
+  text(ComponentStateStrings.liveComponentState()),
+  { ...actionsNode, ariaLabel: ComponentStateStrings.liveComponentStateActions() },
+  { ...refreshButtonNode, ariaLabel: ComponentStateStrings.refresh(), title: ComponentStateStrings.refresh() },
   refreshIconNode,
 ]

@@ -1,4 +1,5 @@
 import { MenuItemFlags } from '@lvce-editor/constants'
+import * as ComponentStateStrings from '../ComponentStateStrings/ComponentStateStrings.ts'
 
 export const getMenuEntries = (
   _uid: number,
@@ -9,6 +10,6 @@ export const getMenuEntries = (
     command: 'ComponentState.showDom',
     flags: domAvailable ? MenuItemFlags.None : MenuItemFlags.Disabled,
     id: 'showDom',
-    label: 'Show Dom',
+    label: ComponentStateStrings.showDom(),
   },
 ]
