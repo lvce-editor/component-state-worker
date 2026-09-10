@@ -1,25 +1,19 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 interface Entry {
   readonly label: string
 }
 
 export const name = 'component-state-view.edit-live-title-bar-item'
 
-export const test: Test = async ({ Command, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const originalEntry = Locator('.TitleBarTopLevelEntry', { hasText: 'File' })
   await expect(originalEntry).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'TitleBar')
   if (!component?.editable) {
     throw new Error(`Expected an editable TitleBar component, got ${JSON.stringify(components)}`)

@@ -1,15 +1,9 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.main-cache-schema'
 
-export const test: Test = async ({ Command, Editor, FileSystem, Main, Workspace }) => {
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+export const test: Test = async ({ Command, ComponentState, Editor, FileSystem, Main, Workspace }) => {
+  const components = await ComponentState.getComponents()
   const main = components.find((component) => component.moduleId === 'Main' && component.editable)
   if (!main) {
     throw new Error(`Expected an editable Main component, got ${JSON.stringify(components)}`)

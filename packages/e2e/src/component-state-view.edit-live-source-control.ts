@@ -1,14 +1,8 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-source-control'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Settings, SideBar, Workspace }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, FileSystem, Locator, Settings, SideBar, Workspace }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
@@ -18,10 +12,10 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await expect(sourceControl).toBeVisible()
   const message = Locator('.SourceControl .Message')
   await expect(message).toHaveText('No source control extensions are installed.')
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'Source Control')
   if (!component?.editable) {
     throw new Error(`Expected an editable Source Control component, got ${JSON.stringify(components)}`)
@@ -45,7 +39,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
 
   await expect(message).toHaveText('Live source control message')
 
-  const updatedState = await Command.execute('ComponentState.getState', component.uid)
+  const updatedState = await ComponentState.getState<{ readonly providerUnavailableMessage: string }>(component.uid)
   if (updatedState.providerUnavailableMessage !== 'Live source control message') {
     throw new Error(`Expected Source Control message to update, got ${updatedState.providerUnavailableMessage}`)
   }

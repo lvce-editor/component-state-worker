@@ -1,24 +1,18 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.unavailable-components-visible'
 
-export const test: Test = async ({ Command, expect, FileSystem, Locator, Settings, Workspace }) => {
+export const test: Test = async ({ ComponentState, Developer, expect, FileSystem, Locator, Settings, SideBar, Workspace }) => {
   await Settings.update({ 'componentStateView.showUnavailableComponents': true })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   await Workspace.setPath(tmpDir)
-  await Command.execute('Layout.showSideBar', 'Explorer')
+  await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
 
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const unavailableComponent = components.find((component) => !component.editable)
   if (!unavailableComponent) {
     throw new Error(`Expected an unavailable component, got ${JSON.stringify(components)}`)

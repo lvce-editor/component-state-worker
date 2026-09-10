@@ -1,14 +1,19 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-save-explorer'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, Settings, Workspace }) => {
+export const test: Test = async ({
+  ComponentState,
+  Developer,
+  Editor,
+  expect,
+  FileSystem,
+  Locator,
+  Main,
+  Settings,
+  SideBar,
+  Workspace,
+}) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.setFiles([
     { content: 'first', uri: `${tmpDir}/a.txt` },
@@ -17,15 +22,15 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   // Keep this component-state test independent of browser-specific font loading behavior.
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   await Workspace.setPath(tmpDir)
-  await Command.execute('Layout.showSideBar', 'Explorer')
+  await SideBar.open('Explorer')
 
   const firstExplorerItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
   const secondExplorerItem = Locator('.Explorer .TreeItem[aria-label="b.txt"]')
   await expect(firstExplorerItem).toBeVisible()
   await expect(secondExplorerItem).toBeVisible()
 
-  await Command.execute('Developer.openComponentState')
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  await Developer.openComponentState()
+  const components = await ComponentState.getComponents()
   const explorer = components.find((component) => component.moduleId === 'Explorer')
   if (!explorer || !explorer.editable) {
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
@@ -50,7 +55,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
   await Main.save()
 
-  const updatedState = await Command.execute('ComponentState.getState', explorer.uid)
+  const updatedState = await ComponentState.getState<{ readonly focusedIndex: number }>(explorer.uid)
   if (updatedState.focusedIndex !== 1) {
     throw new Error(`Expected Explorer focusedIndex to be 1, got ${updatedState.focusedIndex}`)
   }

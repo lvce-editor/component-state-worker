@@ -1,22 +1,16 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-extension-search'
 
-export const test: Test = async ({ Command, Editor, expect, ExtensionSearch, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, ExtensionSearch, Locator, Settings }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   await ExtensionSearch.open()
   const searchInput = Locator('.Extensions [name="extensions"]')
   await expect(searchInput).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'Extensions')
   if (!component?.editable) {
     throw new Error(`Expected an editable Extensions component, got ${JSON.stringify(components)}`)
@@ -40,7 +34,7 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionSearch, Loc
 
   await expect(searchInput).toHaveValue('@disabled')
 
-  const updatedState = await Command.execute('ComponentState.getState', component.uid)
+  const updatedState = await ComponentState.getState<{ readonly searchValue: string }>(component.uid)
   if (updatedState.searchValue !== '@disabled') {
     throw new Error(`Expected Extensions search value to update, got ${updatedState.searchValue}`)
   }

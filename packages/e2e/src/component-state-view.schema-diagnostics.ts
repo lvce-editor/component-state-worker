@@ -1,22 +1,16 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.schema-diagnostics'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, Workspace }) => {
+export const test: Test = async ({ Command, ComponentState, Editor, expect, FileSystem, Locator, Main, SideBar, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   await Workspace.setPath(tmpDir)
-  await Command.execute('Layout.showSideBar', 'Explorer')
+  await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
 
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const explorer = components.find((component) => component.moduleId === 'Explorer' && component.editable)
   if (!explorer) {
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
