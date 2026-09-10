@@ -16,6 +16,8 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await SideBar.open('Source Control')
   const sourceControl = Locator('.SourceControl')
   await expect(sourceControl).toBeVisible()
+  const message = Locator('.SourceControl .Message')
+  await expect(message).toHaveText('No source control extensions are installed.')
   await Command.execute('Developer.openComponentState')
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
@@ -41,7 +43,6 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   }
   await Editor.setText(`${JSON.stringify({ ...state, providerUnavailableMessage: 'Live source control message' }, null, 2)}\n`)
 
-  const message = Locator('.SourceControl .Message')
   await expect(message).toHaveText('Live source control message')
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)
