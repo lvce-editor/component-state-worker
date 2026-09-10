@@ -5,7 +5,7 @@
       "project": ["*.js"]
     },
     "packages/build": {
-      "entry": ["src/build-static.ts", "src/build.ts", "src/computeNodeModulesCacheKey.ts", "src/dev.ts"],
+      "entry": ["src/build-static.ts", "src/build.ts", "src/computeNodeModulesCacheKey.ts", "src/dev.ts", "src/startServer.ts"],
       "project": ["src/**/*.ts"],
       "ignoreDependencies": ["esbuild"]
     },
@@ -16,10 +16,6 @@
     "packages/e2e": {
       "entry": ["src/**/*.ts"],
       "project": ["src/**/*.ts"]
-    },
-    "packages/server": {
-      "entry": ["src/dev.js"],
-      "project": ["src/**/*.js"]
     }
   }
 }
