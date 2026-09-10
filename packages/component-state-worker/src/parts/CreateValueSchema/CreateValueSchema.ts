@@ -22,8 +22,8 @@ export const createValueSchema = (value: unknown, propertyName = ''): JsonSchema
         additionalProperties: true,
         properties: Object.fromEntries(
           Object.entries(value)
-            .filter((entry) => entry[1] !== undefined)
-            .map(([key, child]) => [key, createValueSchema(child, key)]),
+            .filter((entry: readonly [string, unknown]) => entry[1] !== undefined)
+            .map(([key, child]: readonly [string, unknown]) => [key, createValueSchema(child, key)]),
         ),
         type: 'object',
       }
