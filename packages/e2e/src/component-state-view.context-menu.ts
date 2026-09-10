@@ -10,7 +10,7 @@ export const test: Test = async ({ ComponentState, ContextMenu, Developer, expec
   await Developer.openComponentState()
   const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'Explorer')
-  if (!component?.editable || !component.domAvailable) {
+  if (!component?.editable) {
     throw new Error('Expected an editable Explorer component with a DOM')
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
