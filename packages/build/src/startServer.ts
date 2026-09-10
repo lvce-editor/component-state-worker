@@ -1,7 +1,6 @@
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+import { root } from './root.ts'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 process.argv.push('--link', join(root, '.tmp', 'dist'), '--link', join(root, 'node_modules', '@lvce-editor', 'test-worker'))
 
 await import('@lvce-editor/server/bin/server.js')
