@@ -1,7 +1,6 @@
 import { text, type VirtualDomNode, VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 import * as ClassNames from '../ClassNames/ClassNames.ts'
-import { getColumnCount } from '../GetColumnCount/GetColumnCount.ts'
 import { getHeader } from '../GetHeader/GetHeader.ts'
 import { getRows } from '../GetRows/GetRows.ts'
 
@@ -20,10 +19,9 @@ const descriptionNode: VirtualDomNode = {
 export const getComponentStateVirtualDom = (
   components: readonly ComponentInfo[],
   loaded: boolean,
-  width: number,
+  columnCount: number,
 ): readonly VirtualDomNode[] => {
   const description = loaded ? `${components.length} live components` : 'Loading live components…'
-  const columnCount = getColumnCount(width)
   const rowCount = Math.ceil(components.length / columnCount)
   return [
     viewNode,

@@ -7,7 +7,7 @@ export const render2 = (uid: number, diffResult: readonly number[]): readonly an
   ComponentStateViewStates.set(uid, newState, newState)
   const commands: any[] = []
   if (diffResult.includes(1)) {
-    commands.push([ViewletCommand.SetDom2, uid, getComponentStateVirtualDom(newState.components, newState.loaded, newState.width)])
+    commands.push([ViewletCommand.SetDom2, uid, getComponentStateVirtualDom(newState.components, newState.loaded, newState.columnCount)])
   }
   if (diffResult.includes(2)) {
     const { dragUri } = newState

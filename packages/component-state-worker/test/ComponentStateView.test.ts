@@ -40,7 +40,7 @@ test('creates, loads, diffs, and renders the component rows', async () => {
   ComponentStateViewStates.set(7, initial, loaded, loaded)
 
   expect(diff2(7)).toEqual([1])
-  expect(render2(7, [1])).toEqual([[ViewletCommand.SetDom2, 7, getComponentStateVirtualDom(components, true, 300)]])
+  expect(render2(7, [1])).toEqual([[ViewletCommand.SetDom2, 7, getComponentStateVirtualDom(components, true, 1)]])
   expect(ComponentStateViewStates.get(7).oldState).toBe(loaded)
 })
 
@@ -120,14 +120,26 @@ test('calculates the responsive column count from the view width', () => {
   expect(getColumnCount(588)).toBe(3)
 })
 
+test.each([
+  [0, 1],
+  [399, 1],
+  [400, 2],
+  [588, 3],
+])('stores %i width as %i columns on creation', (width, columnCount) => {
+  create(7, 0, 0, width, 100)
+  expect(ComponentStateViewStates.get(7).newState.columnCount).toBe(columnCount)
+})
+
 test('rerenders only when resizing changes the column count', () => {
   create(7, 0, 0, 399, 100)
   const state = ComponentStateViewStates.get(7).newState
   const sameColumnCount = resize(state, { height: 100, width: 380, x: 0, y: 0 })
+  expect(sameColumnCount.columnCount).toBe(1)
   ComponentStateViewStates.set(7, state, sameColumnCount, sameColumnCount)
   expect(diff2(7)).toEqual([])
 
   const twoColumns = resize(state, { height: 100, width: 400, x: 0, y: 0 })
+  expect(twoColumns.columnCount).toBe(2)
   ComponentStateViewStates.set(7, state, twoColumns, twoColumns)
   expect(diff2(7)).toEqual([1])
 })
@@ -137,7 +149,7 @@ test('renders editable and unavailable component cards', () => {
     { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 1 },
     { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 2 },
   ]
-  const dom = getComponentStateVirtualDom(components, true, 400)
+  const dom = getComponentStateVirtualDom(components, true, 2)
 
   expect(dom).toContainEqual(expect.objectContaining({ childCount: 1, className: 'ComponentStateRows' }))
   expect(dom).toContainEqual(expect.objectContaining({ childCount: 2, className: 'ComponentStateRow' }))
@@ -179,7 +191,7 @@ test('renders distinct extension display names and falls back to module ids', ()
     { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 3 },
     { displayName: '', domAvailable: true, editable: false, moduleId: 'Editor', uid: 4 },
   ]
-  const dom = getComponentStateVirtualDom(components, true, 400)
+  const dom = getComponentStateVirtualDom(components, true, 2)
   const titles = dom.flatMap((node, index) => (node.className === 'ComponentStateCardTitle' ? [dom[index + 1].text] : []))
 
   expect(titles).toEqual(['Hetzner (extension)', 'Notes (extension)', 'Explorer', 'Editor'])
@@ -188,26 +200,26 @@ test('renders distinct extension display names and falls back to module ids', ()
 })
 
 test('renders a refresh action button', () => {
-  const dom = getComponentStateVirtualDom([], true, 300)
+  const dom = getComponentStateVirtualDom([], true, 1)
 
   expect(dom).toContainEqual(expect.objectContaining({ ariaLabel: 'Refresh', className: 'IconButton', onClick: 2, title: 'Refresh' }))
   expect(dom).toContainEqual(expect.objectContaining({ className: 'MaskIcon MaskIconRefresh' }))
 })
 
 test('renders the loading state before components are available', () => {
-  const dom = getComponentStateVirtualDom([], false, 300)
+  const dom = getComponentStateVirtualDom([], false, 1)
 
   expect(dom).toContainEqual(expect.objectContaining({ text: 'Loading live components…' }))
 })
 
-test('splits component cards into rows for the available width', () => {
+test('splits component cards into rows for the column count', () => {
   const components = [
     { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 1 },
     { displayName: 'Editor', domAvailable: true, editable: true, moduleId: 'Editor', uid: 2 },
     { displayName: 'Source Control', domAvailable: true, editable: true, moduleId: 'Source Control', uid: 3 },
   ]
 
-  const dom = getComponentStateVirtualDom(components, true, 400)
+  const dom = getComponentStateVirtualDom(components, true, 2)
 
   expect(dom.filter((node) => node.className === 'ComponentStateRow')).toEqual([
     expect.objectContaining({ childCount: 2 }),
