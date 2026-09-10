@@ -61,7 +61,7 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e firefox
         working-directory: ./packages/e2e
-        run: npm run e2e:firefox:headless -- --trace-renderer-worker
+        run: npm run e2e:firefox:headless
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       #- name: e2e webkit
