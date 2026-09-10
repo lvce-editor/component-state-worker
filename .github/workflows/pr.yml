@@ -61,7 +61,7 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e firefox
         working-directory: ./packages/e2e
-        run: npm run e2e:firefox:headless
+        run: npm run e2e:firefox:headless -- --trace-renderer-worker
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       #- name: e2e webkit
@@ -76,6 +76,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: e2e-${{ matrix.os }}-${{ matrix.attempt }}
-          path: .tmp
+          path: |
+            .tmp
+            packages/e2e/renderer-worker-traces
           include-hidden-files: true
           if-no-files-found: ignore
