@@ -69,3 +69,43 @@ await patch(
   let skipped = 0;
   for (const result of results) {`,
 )
+await patch(
+  renderer,
+  '  return handleJsonRpcMessage(event.target, event.data, actualExecute, event.target._resolve, preparePrettyError, logError$1, actualRequiresSocket);',
+  `  return handleJsonRpcMessage(event.target, event.data, actualExecute, event.target._resolve, preparePrettyError, logError$1, actualRequiresSocket).finally(() => {
+    tabDiagnostic('rpc-complete', { method: event.data?.method, id: event.data?.id });
+  });`,
+)
+await patch(
+  renderer,
+  "  'TestFrameWork.showTestResults': showTestResults,",
+  `  'Diagnostic.worker': entries => { globalThis.__workerDiagnostic = entries; },
+  'TestFrameWork.showTestResults': showTestResults,`,
+)
+const worker = join(staticRoot, commit, 'packages/renderer-worker/dist/rendererWorkerMain.js')
+await patch(
+  worker,
+  'const getResponse$2 = async (message, ipc, execute, preparePrettyError, logError, requiresSocket) => {',
+  `const workerDiagnostic = [];
+const getResponse$2 = async (message, ipc, execute, preparePrettyError, logError, requiresSocket) => {
+  const startDiagnostic = performance.now();
+  workerDiagnostic.push({ type: 'start', time: startDiagnostic, method: message.method, id: message.id, command: typeof message.params?.[0] === 'string' ? message.params[0] : undefined });`,
+)
+await patch(
+  worker,
+  '    const result = requiresSocket(message.method) ? await execute(message.method, ipc, ...message.params) : await execute(message.method, ...message.params);',
+  `    const result = requiresSocket(message.method) ? await execute(message.method, ipc, ...message.params) : await execute(message.method, ...message.params);
+    workerDiagnostic.push({ type: 'end', time: performance.now(), start: startDiagnostic, method: message.method, id: message.id });`,
+)
+await patch(
+  worker,
+  "const showTestResults = (...args) => {\n  return invoke$N('TestFrameWork.showTestResults', ...args);",
+  `const showTestResults = async (...args) => {
+  await state$G.rpc.invoke('Diagnostic.worker', workerDiagnostic);
+  return invoke$N('TestFrameWork.showTestResults', ...args);`,
+)
+await patch(
+  runner,
+  'const diagnostic = await page.evaluate(() => globalThis.__tabDiagnostic || []);',
+  'const diagnostic = await page.evaluate(() => [...(globalThis.__tabDiagnostic || []), { type: "worker", entries: globalThis.__workerDiagnostic || [] }]);',
+)
