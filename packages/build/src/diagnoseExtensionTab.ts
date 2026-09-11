@@ -4,6 +4,15 @@ import { root } from './root.ts'
 
 const patch = async (path: string, before: string, after: string): Promise<void> => {
   const content = await readFile(path, 'utf8')
+  if (before.startsWith('  let failed = 0;') && content.includes('const fsDiagnostic = await import')) {
+    return
+  }
+  if (before.startsWith('const getResponse$2 =') && content.includes('const workerDiagnostic = []')) {
+    return
+  }
+  if (before.includes("'TestFrameWork.showTestResults': showTestResults,") && content.includes("'Diagnostic.worker':")) {
+    return
+  }
   if (content.includes(after)) {
     return
   }
@@ -136,4 +145,44 @@ await patch(
   return result;
 };
 const executeDiagnosticOriginal = (command, ...args) => {`,
+)
+await patch(
+  worker,
+  '  Object.assign(commandMapRef, commandMap);',
+  `  state$K.commands['Diagnostic.editor'] = entry => { workerDiagnostic.push(entry); };
+  Object.assign(commandMapRef, commandMap);`,
+)
+const editor = join(staticRoot, commit, 'packages/editor-worker/dist/editorWorkerMain.js')
+await patch(
+  editor,
+  'const loadContent = async (state, savedState) => {',
+  `const loadContent = async (state, savedState) => {
+  const editorDiagnostic = phase => { void invoke$a('Diagnostic.editor', { type: 'editor-phase', time: performance.now(), phase, id: state.id }).catch(() => {}); };
+  editorDiagnostic('start');`,
+)
+await patch(editor, '} = await getEditorPreferences();', "} = await getEditorPreferences();\n  editorDiagnostic('preferences');")
+await patch(
+  editor,
+  "  editorDiagnostic('preferences');\n  // TODO support overwriting language id by setting it explicitly or via settings\n  const charWidth = await measureCharacterWidth(fontWeight, fontSize, fontFamily, letterSpacing);",
+  `  editorDiagnostic('preferences');
+  // TODO support overwriting language id by setting it explicitly or via settings
+  const charWidth = await measureCharacterWidth(fontWeight, fontSize, fontFamily, letterSpacing);
+  editorDiagnostic('measureCharacterWidth');`,
+)
+await patch(editor, '  setTokenizePaths(languages);', "  editorDiagnostic('languages');\n  setTokenizePaths(languages);")
+await patch(
+  editor,
+  '  await loadTokenizer(computedLanguageId, tokenizePath);',
+  "  await loadTokenizer(computedLanguageId, tokenizePath);\n  editorDiagnostic('tokenizer');",
+)
+await patch(
+  editor,
+  '  const savedHistory = existingEditor ? undefined : getSavedHistory(savedState, content);',
+  "  editorDiagnostic('readFile');\n  const savedHistory = existingEditor ? undefined : getSavedHistory(savedState, content);",
+)
+await patch(editor, '  const newEditor3WithBreadcrumbs = {', "  editorDiagnostic('breadcrumbs');\n  const newEditor3WithBreadcrumbs = {")
+await patch(
+  editor,
+  '  } = await getVisible$1(newEditor3WithBreadcrumbs, syncIncremental);',
+  "  } = await getVisible$1(newEditor3WithBreadcrumbs, syncIncremental);\n  editorDiagnostic('visible');",
 )
