@@ -212,11 +212,38 @@ await patch(
 )
 await patch(
   extensionManagement,
-  "invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri')",
   "invoke$3('PlatformPaths.getDisabledExtensionsJsonUri')",
+  "invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri')",
 )
 await patch(
   extensionManagement,
-  "invoke$4('WebView.compatSharedProcessInvoke', 'Platform.getConfigUri')",
   "invoke$3('Platform.getConfigUri')",
+  "invoke$4('WebView.compatSharedProcessInvoke', 'Platform.getConfigUri')",
+)
+await patch(
+  extensionManagement,
+  'const getRemoteExtensionEnablement = async () => {',
+  `let disabledUriPromise;
+const getDisabledUri = () => {
+  if (!disabledUriPromise) {
+    disabledUriPromise = invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri').catch(error => { disabledUriPromise = undefined; throw error; });
+  }
+  return disabledUriPromise;
+};
+const getRemoteExtensionEnablement = async () => {`,
+)
+await patch(
+  extensionManagement,
+  "    const uri = await invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri');",
+  '    const uri = await getDisabledUri();',
+)
+await patch(
+  extensionManagement,
+  'const getConfigUri = async () => {',
+  `let configUriPromise;
+const getConfigUri = () => {
+  if (!configUriPromise) { configUriPromise = getConfigUriUncached().catch(error => { configUriPromise = undefined; throw error; }); }
+  return configUriPromise;
+};
+const getConfigUriUncached = async () => {`,
 )
