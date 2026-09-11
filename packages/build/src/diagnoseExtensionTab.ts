@@ -109,3 +109,18 @@ await patch(
   'const diagnostic = await page.evaluate(() => globalThis.__tabDiagnostic || []);',
   'const diagnostic = await page.evaluate(() => [...(globalThis.__tabDiagnostic || []), { type: "worker", entries: globalThis.__workerDiagnostic || [] }]);',
 )
+await patch(
+  worker,
+  'const workerDiagnostic = [];',
+  `const workerDiagnostic = [];
+setInterval(() => {
+  if (workerDiagnostic.length && state$G.rpc) {
+    void state$G.rpc.invoke('Diagnostic.worker', workerDiagnostic.splice(0)).catch(() => {});
+  }
+}, 250);`,
+)
+await patch(
+  renderer,
+  "'Diagnostic.worker': entries => { globalThis.__workerDiagnostic = entries; },",
+  "'Diagnostic.worker': entries => { (globalThis.__workerDiagnostic ||= []).push(...entries); },",
+)
