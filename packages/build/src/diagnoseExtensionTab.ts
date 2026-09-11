@@ -186,3 +186,27 @@ await patch(
   '  } = await getVisible$1(newEditor3WithBreadcrumbs, syncIncremental);',
   "  } = await getVisible$1(newEditor3WithBreadcrumbs, syncIncremental);\n  editorDiagnostic('visible');",
 )
+const extensionManagement = join(staticRoot, commit, 'packages/extension-management-worker/dist/extensionManagementWorkerMain.js')
+await patch(
+  extensionManagement,
+  'const getAllExtensionsWithState = async (extensionsState, assetDir, platform) => {',
+  `const getAllExtensionsWithState = async (extensionsState, assetDir, platform) => {
+  const diagnosticId = performance.now();
+  const extensionDiagnostic = phase => { void invoke$4('Diagnostic.editor', { type: 'extension-phase', time: performance.now(), phase, id: diagnosticId, platform }).catch(() => {}); };
+  extensionDiagnostic('start');`,
+)
+await patch(
+  extensionManagement,
+  '  const meta = extensionsState.webExtensions;',
+  "  extensionDiagnostic('runtime');\n  const meta = extensionsState.webExtensions;",
+)
+await patch(
+  extensionManagement,
+  "  const local = await invoke$3('ExtensionManagement.getAllExtensions');\n  return getExtensionsWithState([...local, ...meta], extensionsState, resolvedPlatform);",
+  `  extensionDiagnostic('shared-start');
+  const local = await invoke$3('ExtensionManagement.getAllExtensions');
+  extensionDiagnostic('shared-end');
+  const result = await getExtensionsWithState([...local, ...meta], extensionsState, resolvedPlatform);
+  extensionDiagnostic('enablement-end');
+  return result;`,
+)
