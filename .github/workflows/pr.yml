@@ -29,7 +29,7 @@ jobs:
         id: npm-cache
         with:
           path: '**/node_modules'
-          key: diagnostic-completion-${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+          key: diagnostic-extension-rpc-${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'

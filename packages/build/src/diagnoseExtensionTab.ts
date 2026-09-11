@@ -210,40 +210,19 @@ await patch(
   extensionDiagnostic('enablement-end');
   return result;`,
 )
+
 await patch(
   extensionManagement,
-  "invoke$3('PlatformPaths.getDisabledExtensionsJsonUri')",
-  "invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri')",
+  'const invokeHelper = async (callbacks, ipc, method, params, useSendAndTransfer) => {',
+  `const invokeHelper = async (callbacks, ipc, method, params, useSendAndTransfer) => {
+  const diagnosticStart = performance.now();`,
 )
 await patch(
   extensionManagement,
-  "invoke$3('Platform.getConfigUri')",
-  "invoke$4('WebView.compatSharedProcessInvoke', 'Platform.getConfigUri')",
-)
-await patch(
-  extensionManagement,
-  'const getRemoteExtensionEnablement = async () => {',
-  `let disabledUriPromise;
-const getDisabledUri = () => {
-  if (!disabledUriPromise) {
-    disabledUriPromise = invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri').catch(error => { disabledUriPromise = undefined; throw error; });
+  '  const responseMessage = await promise;\n  return unwrapJsonRpcResult(responseMessage);',
+  `  const responseMessage = await promise;
+  if (method !== 'Diagnostic.editor') {
+    void invoke$4('Diagnostic.editor', { type: 'extension-rpc', time: performance.now(), start: diagnosticStart, method }).catch(() => {});
   }
-  return disabledUriPromise;
-};
-const getRemoteExtensionEnablement = async () => {`,
-)
-await patch(
-  extensionManagement,
-  "    const uri = await invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri');",
-  '    const uri = await getDisabledUri();',
-)
-await patch(
-  extensionManagement,
-  'const getConfigUri = async () => {',
-  `let configUriPromise;
-const getConfigUri = () => {
-  if (!configUriPromise) { configUriPromise = getConfigUriUncached().catch(error => { configUriPromise = undefined; throw error; }); }
-  return configUriPromise;
-};
-const getConfigUriUncached = async () => {`,
+  return unwrapJsonRpcResult(responseMessage);`,
 )
