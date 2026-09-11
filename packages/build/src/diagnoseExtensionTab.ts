@@ -210,3 +210,13 @@ await patch(
   extensionDiagnostic('enablement-end');
   return result;`,
 )
+await patch(
+  extensionManagement,
+  "invoke$4('WebView.compatSharedProcessInvoke', 'PlatformPaths.getDisabledExtensionsJsonUri')",
+  "invoke$3('PlatformPaths.getDisabledExtensionsJsonUri')",
+)
+await patch(
+  extensionManagement,
+  "invoke$4('WebView.compatSharedProcessInvoke', 'Platform.getConfigUri')",
+  "invoke$3('Platform.getConfigUri')",
+)
