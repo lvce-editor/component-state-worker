@@ -124,3 +124,16 @@ await patch(
   "'Diagnostic.worker': entries => { globalThis.__workerDiagnostic = entries; },",
   "'Diagnostic.worker': entries => { (globalThis.__workerDiagnostic ||= []).push(...entries); },",
 )
+await patch(
+  worker,
+  'const execute$5 = (command, ...args) => {',
+  `const execute$5 = (command, ...args) => {
+  const start = performance.now();
+  workerDiagnostic.push({ type: 'command-start', time: start, command });
+  const result = executeDiagnosticOriginal(command, ...args);
+  const finish = () => workerDiagnostic.push({ type: 'command-end', time: performance.now(), start, command });
+  if (result && typeof result.then === 'function') { result.then(finish, finish); } else { finish(); }
+  return result;
+};
+const executeDiagnosticOriginal = (command, ...args) => {`,
+)
