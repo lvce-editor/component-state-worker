@@ -14,6 +14,7 @@ export const test: Test = async ({ ComponentState, ContextMenu, Developer, expec
   await expect(card).toBeVisible()
   // eslint-disable-next-line e2e/no-direct-click -- the component card context-menu event is the behavior under test
   await card.click({ button: 'right' })
+  await expect(Locator('[role="menuitem"]', { hasText: 'Show Dom' })).toBeVisible()
   await ContextMenu.selectItem('Show Dom')
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
