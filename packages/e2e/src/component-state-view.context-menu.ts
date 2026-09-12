@@ -2,9 +2,6 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.context-menu'
 
-// Requires the renderer menu-worker port bridge in the server dependency.
-export const skip = 1
-
 export const test: Test = async ({ ComponentState, ContextMenu, Developer, expect, Locator, SideBar }) => {
   await SideBar.open('Explorer')
   await Developer.openComponentState()
