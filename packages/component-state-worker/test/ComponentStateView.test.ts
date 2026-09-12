@@ -19,6 +19,11 @@ jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
   },
 }))
 
+jest.unstable_mockModule('../src/parts/MenuWorker/MenuWorker.ts', () => ({
+  show2: jest.fn(),
+}))
+
+const MenuWorker = await import('../src/parts/MenuWorker/MenuWorker.ts')
 const { RendererWorker } = await import('@lvce-editor/rpc-registry')
 const { handleContextMenu } = await import('../src/parts/HandleContextMenu/HandleContextMenu.ts')
 const { showDom } = await import('../src/parts/ShowDom/ShowDom.ts')
@@ -234,8 +239,9 @@ test('opens a context menu for the right-clicked component without opening its s
     components: [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 0.25 }],
   }
   await expect(handleContextMenu(state, '0.25', 120, 240)).resolves.toBe(state)
-  expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
-  expect(RendererWorker.invoke).toHaveBeenCalledWith('ContextMenu.show2', 7, 34, 120, 240, {
+  expect(RendererWorker.invoke).not.toHaveBeenCalled()
+  expect(MenuWorker.show2).toHaveBeenCalledTimes(1)
+  expect(MenuWorker.show2).toHaveBeenCalledWith(7, 34, 120, 240, {
     componentUid: 0.25,
     domAvailable: true,
     heapSnapshotAvailable: false,
@@ -250,6 +256,7 @@ test('ignores unavailable or unknown context-menu targets', async () => {
   }
   await expect(handleContextMenu(state, '9', 0, 0)).resolves.toBe(state)
   await expect(handleContextMenu(state, '10', 0, 0)).resolves.toBe(state)
+  expect(MenuWorker.show2).not.toHaveBeenCalled()
   expect(RendererWorker.invoke).not.toHaveBeenCalled()
 })
 
