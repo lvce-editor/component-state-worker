@@ -14,7 +14,7 @@ export const test: Test = async ({ Command, ComponentState, Developer, expect, L
   await expect(card).toBeVisible()
   const view = await ComponentState.getComponent('ComponentState')
   await Command.execute('Viewlet.executeViewletCommand', view.uid, 'handleContextMenu', String(explorer.uid), 100, 100)
-  const action = Locator('[role="menuitem"]:has-text("Show Heap Snapshot")')
+  const action = Locator('[role="menuitem"]', { hasText: 'Show Heap Snapshot' })
   await expect(action).toBeVisible()
   await expect(action).toHaveAttribute('aria-disabled', 'true')
 }
