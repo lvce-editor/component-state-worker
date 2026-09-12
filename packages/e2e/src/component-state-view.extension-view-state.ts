@@ -27,7 +27,8 @@ export const test: Test = async ({ ActivityBar, ComponentState, Developer, Edito
   await Developer.openComponentState()
   const extensionViewCard = Locator(`.ComponentStateCard[data-uid="${extensionView.uid}"]`)
   await expect(extensionViewCard).toBeVisible()
-  await expect(extensionViewCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
+  const cardStatus = extensionViewCard.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
 
   // eslint-disable-next-line e2e/no-direct-click -- verifies that the extension component card opens its live JSON editor
   await extensionViewCard.click()
