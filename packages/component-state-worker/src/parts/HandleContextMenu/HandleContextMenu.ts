@@ -1,6 +1,6 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ComponentStateViewState } from '../ComponentStateViewState/ComponentStateViewState.ts'
 import * as MenuEntryId from '../MenuEntryId/MenuEntryId.ts'
+import * as MenuWorker from '../MenuWorker/MenuWorker.ts'
 
 export const handleContextMenu = async (
   state: ComponentStateViewState,
@@ -14,9 +14,10 @@ export const handleContextMenu = async (
   if (!component) {
     return state
   }
-  await RendererWorker.invoke('ContextMenu.show2', viewUid, MenuEntryId.ComponentState, x, y, {
+  await MenuWorker.show2(viewUid, MenuEntryId.ComponentState, x, y, {
     componentUid,
     domAvailable: component.domAvailable,
+    heapSnapshotAvailable: component.heapSnapshotAvailable === true,
   })
   return state
 }

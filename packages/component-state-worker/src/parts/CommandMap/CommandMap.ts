@@ -14,6 +14,7 @@ import * as Render2 from '../Render2/Render2.ts'
 import * as RenderEventListeners from '../RenderEventListeners/RenderEventListeners.ts'
 import * as Resize from '../Resize/Resize.ts'
 import * as ShowDom from '../ShowDom/ShowDom.ts'
+import * as ShowHeapSnapshot from '../ShowHeapSnapshot/ShowHeapSnapshot.ts'
 
 export const viewCommandMap = {
   'ComponentState.handleClick': ComponentStateViewStates.wrapCommand(HandleClick.handleClick),
@@ -21,6 +22,7 @@ export const viewCommandMap = {
   'ComponentState.handlePointerDown': ComponentStateViewStates.wrapCommand(HandlePointerDown.handlePointerDown),
   'ComponentState.refresh': ComponentStateViewStates.wrapCommand(Refresh.refresh),
   'ComponentState.showDom': ComponentStateViewStates.wrapCommand(ShowDom.showDom),
+  'ComponentState.showHeapSnapshot': ComponentStateViewStates.wrapCommand(ShowHeapSnapshot.showHeapSnapshot),
 }
 
 export const commandMap = {
