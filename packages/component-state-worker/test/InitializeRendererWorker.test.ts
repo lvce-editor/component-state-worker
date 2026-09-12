@@ -2,6 +2,7 @@ import { expect, jest, test } from '@jest/globals'
 
 jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
   EditorWorker: {},
+  MainProcess: {},
   RendererWorker: {
     initializeRendererWorkerForWorker: jest.fn<(commandMap: object) => Promise<void>>().mockResolvedValue(undefined),
   },
