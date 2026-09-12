@@ -1,6 +1,7 @@
 import { ViewletCommand } from '@lvce-editor/constants'
 import * as ComponentStateViewStates from '../ComponentStateViewStates/ComponentStateViewStates.ts'
 import { getComponentStateVirtualDom } from '../GetComponentStateVirtualDom/GetComponentStateVirtualDom.ts'
+import { renderDragData } from '../RenderDragData/RenderDragData.ts'
 
 export const render2 = (uid: number, diffResult: readonly number[]): readonly any[] => {
   const { newState } = ComponentStateViewStates.get(uid)
@@ -10,19 +11,7 @@ export const render2 = (uid: number, diffResult: readonly number[]): readonly an
     commands.push([ViewletCommand.SetDom2, uid, getComponentStateVirtualDom(newState.components, newState.loaded, newState.columnCount)])
   }
   if (diffResult.includes(2)) {
-    const { dragUri } = newState
-    commands.push([
-      'Viewlet.setDragData',
-      uid,
-      {
-        items: dragUri
-          ? [
-              { data: dragUri, type: 'text/uri-list' },
-              { data: dragUri, type: 'text/plain' },
-            ]
-          : [],
-      },
-    ])
+    commands.push(renderDragData(newState))
   }
   return commands
 }
