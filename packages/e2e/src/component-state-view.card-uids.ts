@@ -16,6 +16,7 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   for (const component of components) {
     const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
     await expect(card).toHaveAttribute('data-uid', String(component.uid))
-    await expect(card.locator('.ComponentStateCardUid')).toHaveText(`uid ${component.uid}`)
+    const cardUid = card.locator('.ComponentStateCardUid')
+    await expect(cardUid).toHaveText(`uid ${component.uid}`)
   }
 }
