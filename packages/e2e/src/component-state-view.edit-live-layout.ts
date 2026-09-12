@@ -14,7 +14,7 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   const state = await ComponentState.getState<{ readonly sideBarWidth: number }>(component.uid)
   const { sideBarWidth: originalWidth } = state
   const sideBarWidth = originalWidth === 320 ? 340 : 320
-  const sideBar = Locator('.SideBar').first()
+  const sideBar = Locator('.SideBar:not(.SecondarySideBar)')
   try {
     await FileSystem.writeFile(`live-component-state:///${component.uid}.json`, JSON.stringify({ ...state, sideBarWidth }))
     await expect(sideBar).toHaveCSS('width', `${sideBarWidth}px`)
