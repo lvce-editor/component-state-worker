@@ -1,6 +1,7 @@
 import { text, type VirtualDomNode, VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 import * as ClassNames from '../ClassNames/ClassNames.ts'
+import * as ComponentStateStrings from '../ComponentStateStrings/ComponentStateStrings.ts'
 import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEventListenerFunctions.ts'
 
 const titleNode: VirtualDomNode = {
@@ -22,7 +23,7 @@ const statusNode: VirtualDomNode = {
 }
 
 export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => {
-  const status = component.editable ? 'Open JSON state' : 'State API unavailable'
+  const status = component.editable ? ComponentStateStrings.openJsonState() : ComponentStateStrings.stateApiUnavailable()
   return [
     {
       childCount: 3,
@@ -39,7 +40,7 @@ export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => 
     titleNode,
     text(component.displayName || component.moduleId),
     uidNode,
-    text(`uid ${component.uid}`),
+    text(ComponentStateStrings.uid(component.uid)),
     statusNode,
     text(status),
   ]
