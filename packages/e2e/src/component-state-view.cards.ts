@@ -18,7 +18,10 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   }
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(explorerCard).toBeVisible()
-  await expect(explorerCard.locator('.ComponentStateCardTitle')).toHaveText('Explorer')
-  await expect(explorerCard.locator('.ComponentStateCardUid')).toContainText('uid ')
-  await expect(explorerCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
+  const cardTitle = explorerCard.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('Explorer')
+  const cardUid = explorerCard.locator('.ComponentStateCardUid')
+  await expect(cardUid).toContainText('uid ')
+  const cardStatus = explorerCard.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
 }

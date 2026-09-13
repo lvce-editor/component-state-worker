@@ -18,5 +18,6 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   }
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(explorerCard).toHaveAttribute('disabled', null)
-  await expect(explorerCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
+  const cardStatus = explorerCard.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
 }
