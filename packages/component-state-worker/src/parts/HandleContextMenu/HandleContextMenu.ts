@@ -14,9 +14,10 @@ export const handleContextMenu = async (
   if (!component) {
     return state
   }
-  await MenuWorker.show2(viewUid, MenuEntryId.ComponentState, x, y, {
+  const args = {
     componentUid,
     domAvailable: component.domAvailable,
-  })
+  }
+  await MenuWorker.show2(viewUid, MenuEntryId.ComponentState, x, y, args)
   return state
 }
