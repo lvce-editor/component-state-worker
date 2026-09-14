@@ -36,3 +36,7 @@ export const loadingLiveComponents = (): string => {
 export const showDom = (): string => {
   return i18nString(UiStrings.ShowDom)
 }
+
+export const copyStateAsJson = (): string => {
+  return i18nString(UiStrings.CopyStateAsJson)
+}

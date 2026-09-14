@@ -5,10 +5,11 @@ import { getMenuEntryIds } from '../src/parts/GetMenuEntryIds/GetMenuEntryIds.ts
 test('offers Show Dom for the component passed by the card', () => {
   expect(getMenuEntryIds()).toEqual([34])
   expect(getMenuEntries(7, { componentUid: 0.25 })).toEqual([
+    { args: [0.25], command: 'ComponentState.copyState', flags: 0, id: 'copyState', label: 'Copy State as JSON' },
     { args: [0.25], command: 'ComponentState.showDom', flags: 0, id: 'showDom', label: 'Show Dom' },
   ])
 })
 
 test('disables DOM inspection for components without a DOM API', () => {
-  expect(getMenuEntries(7, { componentUid: 9, domAvailable: false })[0]).toEqual(expect.objectContaining({ flags: 5, label: 'Show Dom' }))
+  expect(getMenuEntries(7, { componentUid: 9, domAvailable: false })[1]).toEqual(expect.objectContaining({ flags: 5, label: 'Show Dom' }))
 })
