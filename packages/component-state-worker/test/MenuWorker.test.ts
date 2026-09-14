@@ -24,10 +24,7 @@ test('sends the message port to the menu worker', async () => {
 
   await send(port)
 
-  expect(RendererWorker.invokeAndTransfer).toHaveBeenCalledWith(
-    'SendMessagePortToExtensionHostWorker.sendMessagePortToMenuWorker',
-    port,
-  )
+  expect(RendererWorker.invokeAndTransfer).toHaveBeenCalledWith('SendMessagePortToExtensionHostWorker.sendMessagePortToMenuWorker', port)
 })
 
 test('shows a menu', async () => {
