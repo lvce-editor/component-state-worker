@@ -9,6 +9,7 @@ test('provides the component state labels', () => {
   expect(ComponentStateStrings.stateApiUnavailable()).toBe('State API unavailable')
   expect(ComponentStateStrings.loadingLiveComponents()).toBe('Loading live components…')
   expect(ComponentStateStrings.showDom()).toBe('Show Dom')
+  expect(ComponentStateStrings.copyStateAsJson()).toBe('Copy State as JSON')
 })
 
 test.each([0, 1, 42])('interpolates component count and uid %i', (value) => {

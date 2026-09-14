@@ -1,4 +1,5 @@
 import * as ComponentStateViewStates from '../ComponentStateViewStates/ComponentStateViewStates.ts'
+import * as CopyState from '../CopyState/CopyState.ts'
 import * as Create from '../Create/Create.ts'
 import * as Diff2 from '../Diff2/Diff2.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
@@ -16,6 +17,7 @@ import * as Resize from '../Resize/Resize.ts'
 import * as ShowDom from '../ShowDom/ShowDom.ts'
 
 export const viewCommandMap = {
+  'ComponentState.copyState': ComponentStateViewStates.wrapCommand(CopyState.copyState),
   'ComponentState.handleClick': ComponentStateViewStates.wrapCommand(HandleClick.handleClick),
   'ComponentState.handleContextMenu': ComponentStateViewStates.wrapCommand(HandleContextMenu.handleContextMenu),
   'ComponentState.handlePointerDown': ComponentStateViewStates.wrapCommand(HandlePointerDown.handlePointerDown),

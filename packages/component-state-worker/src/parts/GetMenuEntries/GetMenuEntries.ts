@@ -7,6 +7,13 @@ export const getMenuEntries = (
 ): readonly any[] => [
   {
     args: [componentUid],
+    command: 'ComponentState.copyState',
+    flags: MenuItemFlags.None,
+    id: 'copyState',
+    label: ComponentStateStrings.copyStateAsJson(),
+  },
+  {
+    args: [componentUid],
     command: 'ComponentState.showDom',
     flags: domAvailable ? MenuItemFlags.None : MenuItemFlags.Disabled,
     id: 'showDom',
