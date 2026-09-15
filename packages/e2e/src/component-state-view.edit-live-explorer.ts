@@ -9,7 +9,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
 
   const firstExplorerItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
@@ -26,7 +26,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
 
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   const editor = Locator('.Editor')
-  // eslint-disable-next-line e2e/no-direct-click -- verifies that opening a component state subscribes its editor to live updates
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies that opening a component state subscribes its editor to live updates
   await Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`).click()
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
   await expect(editor).toBeVisible()

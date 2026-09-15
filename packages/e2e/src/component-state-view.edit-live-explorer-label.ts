@@ -10,7 +10,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/original.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const originalItem = Locator('.Explorer .TreeItem[aria-label="original.txt"]')
   await expect(originalItem).toBeVisible()
@@ -26,7 +26,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await expect(card).toBeVisible()
   await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Explorer')
   await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

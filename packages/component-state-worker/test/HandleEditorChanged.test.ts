@@ -61,3 +61,21 @@ test.each(['[', '{}', 'null'])('ignores incomplete or non-array DOM JSON: %s', a
   await handleEditorChanged(99, 'live-component-state:///dom/7.json')
   expect(RendererWorker.invoke).not.toHaveBeenCalled()
 })
+
+test('applies overlapping editor changes in order', async () => {
+  const firstRead = Promise.withResolvers<string>()
+  jest.mocked(EditorWorker.invoke).mockReturnValueOnce(firstRead.promise).mockResolvedValueOnce('{"uid":7,"title":"Latest"}')
+  const first = handleEditorChanged(99, 'live-component-state:///7.json')
+  const second = handleEditorChanged(99, 'live-component-state:///7.json')
+  firstRead.resolve('{"uid":7,"title":"Earlier"}')
+  await Promise.all([first, second])
+  expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.setState', 7, { title: 'Latest', uid: 7 })
+})
+
+test('accepts a new edit after a failed content read', async () => {
+  jest.mocked(EditorWorker.invoke).mockRejectedValueOnce(new Error('read failed'))
+  await expect(handleEditorChanged(99, 'live-component-state:///7.json')).rejects.toThrow('read failed')
+  jest.mocked(EditorWorker.invoke).mockResolvedValueOnce('{"uid":7,"title":"Recovered"}')
+  await handleEditorChanged(99, 'live-component-state:///7.json')
+  expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.setState', 7, { title: 'Recovered', uid: 7 })
+})

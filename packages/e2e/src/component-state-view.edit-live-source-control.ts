@@ -2,11 +2,24 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.edit-live-source-control'
 
-export const test: Test = async ({ ComponentState, Developer, Editor, expect, FileSystem, Locator, Settings, SideBar, Workspace }) => {
+export const test: Test = async ({
+  Command,
+  ComponentState,
+  Developer,
+  Editor,
+  expect,
+  FileSystem,
+  Locator,
+  Settings,
+  SideBar,
+  Workspace,
+}) => {
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
+  await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Source Control')
   const sourceControl = Locator('.SourceControl')
   await expect(sourceControl).toBeVisible()
@@ -24,7 +37,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await expect(card).toBeVisible()
   await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Source Control')
   await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
