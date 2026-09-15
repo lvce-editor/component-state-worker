@@ -8,3 +8,4 @@ node_modules
 *.tgz
 
 packages/e2e/fixtures/sample.component-state-extension-names/rpc.js
+packages/e2e/fixtures/*/main.bundle.js

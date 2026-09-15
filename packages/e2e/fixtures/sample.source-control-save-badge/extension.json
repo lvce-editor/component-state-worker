@@ -2,7 +2,7 @@
   "id": "sample.source-control-save-badge",
   "name": "Source Control Save Badge",
   "version": "0.0.0",
-  "browser": "main.js",
+  "browser": "main.bundle.js",
   "isolated": true,
   "activation": ["onSourceControl:memfs", "onCommand:sourceControlSaveBadge.clear"],
   "commands": [
