@@ -2,7 +2,9 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.edit-live-status-bar'
 
-export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ Command, ComponentState, Developer, Editor, expect, Locator, Settings }) => {
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
+  await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const statusBar = Locator('.StatusBar')
   await expect(statusBar).toBeVisible()

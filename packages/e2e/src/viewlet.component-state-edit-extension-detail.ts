@@ -11,7 +11,7 @@ interface ComponentInfo {
 export const name = 'viewlet.component-state-edit-extension-detail'
 
 export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Locator, Main }) => {
-  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json', '', 0)
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
   await Command.execute('Layout.handleExtensionsChanged')
   await ExtensionDetail.open('builtin.theme-atom-one-dark')
   const extensionName = Locator('.ExtensionDetailName')
@@ -38,10 +38,11 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Loc
   )
   await Main.save()
 
-  const updatedState = await Command.execute('ComponentState.getState', component.uid)
-  if (updatedState.name !== 'Live State Extension') {
-    throw new Error(`Expected ExtensionDetail name to update, got ${updatedState.name}`)
-  }
+  await waitForState(
+    async () => Command.execute('ComponentState.getState', component.uid),
+    (value) => value.name === 'Live State Extension',
+    'the saved extension name',
+  )
   await ExtensionDetail.open('builtin.theme-atom-one-dark')
   await expect(extensionName).toContainText('Live State Extension')
 }

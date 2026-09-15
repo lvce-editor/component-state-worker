@@ -1,9 +1,11 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
+// eslint-disable-next-line e2e/no-imports -- rendering can complete before the state snapshot is committed
+import { waitForState } from './_waitForState.ts'
 
 export const name = 'component-state-view.edit-live-extension-search'
 
 export const test: Test = async ({ Command, ComponentState, Developer, Editor, expect, ExtensionSearch, Locator, Settings }) => {
-  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json', '', 0)
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
   await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   await ExtensionSearch.open()
@@ -36,8 +38,9 @@ export const test: Test = async ({ Command, ComponentState, Developer, Editor, e
 
   await expect(searchInput).toHaveValue('@disabled')
 
-  const updatedState = await ComponentState.getState<{ readonly searchValue: string }>(component.uid)
-  if (updatedState.searchValue !== '@disabled') {
-    throw new Error(`Expected Extensions search value to update, got ${updatedState.searchValue}`)
-  }
+  await waitForState(
+    async () => ComponentState.getState<{ readonly searchValue: string }>(component.uid),
+    (value) => value.searchValue === '@disabled',
+    'the live extension search value',
+  )
 }

@@ -1,8 +1,12 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
+// eslint-disable-next-line e2e/no-imports -- wait for the live state edit to be applied
+import { waitForState } from './_waitForState.ts'
 
 export const name = 'component-state-view.edit-live-extension-detail'
 
-export const test: Test = async ({ ComponentState, Developer, Editor, expect, ExtensionDetail, Locator, Settings }) => {
+export const test: Test = async ({ Command, ComponentState, Developer, Editor, expect, ExtensionDetail, Locator, Settings }) => {
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
+  await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   await ExtensionDetail.open('builtin.language-features-json')
   const extensionName = Locator('.ExtensionDetailName')
@@ -32,6 +36,11 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Ex
   }
   await Editor.setText(`${JSON.stringify({ ...state, name: 'Live State Extension' }, null, 2)}\n`)
 
+  await waitForState(
+    async () => ComponentState.getState<{ readonly name: string }>(component.uid),
+    (value) => value.name === 'Live State Extension',
+    'the live extension name',
+  )
   await ExtensionDetail.open('builtin.language-features-json')
   await expect(extensionName).toContainText('Live State Extension')
 

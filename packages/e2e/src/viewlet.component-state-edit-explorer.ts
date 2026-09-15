@@ -11,7 +11,7 @@ interface ComponentInfo {
 export const name = 'viewlet.component-state-edit-explorer'
 
 export const test: Test = async ({ Command, Editor, expect, Explorer, FileSystem, Locator, Main, Settings, Workspace }) => {
-  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json', '', 0)
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
   await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace', 'editor.lineNumbers': 'on' })
   const tmpDir = await FileSystem.getTmpDir()
