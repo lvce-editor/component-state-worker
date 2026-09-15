@@ -22,7 +22,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
     throw new Error(`Expected an editable SimpleBrowser component, got ${JSON.stringify(components)}`)
   }
 
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await Locator(`.ComponentStateCard[data-uid="${component.uid}"]`).click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

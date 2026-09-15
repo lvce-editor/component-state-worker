@@ -61,3 +61,13 @@ test.each(['[', '{}', 'null'])('ignores incomplete or non-array DOM JSON: %s', a
   await handleEditorChanged(99, 'live-component-state:///dom/7.json')
   expect(RendererWorker.invoke).not.toHaveBeenCalled()
 })
+
+test('applies overlapping editor changes in order', async () => {
+  const firstRead = Promise.withResolvers<string>()
+  jest.mocked(EditorWorker.invoke).mockReturnValueOnce(firstRead.promise).mockResolvedValueOnce('{"uid":7,"title":"Latest"}')
+  const first = handleEditorChanged(99, 'live-component-state:///7.json')
+  const second = handleEditorChanged(99, 'live-component-state:///7.json')
+  firstRead.resolve('{"uid":7,"title":"Earlier"}')
+  await Promise.all([first, second])
+  expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.setState', 7, { title: 'Latest', uid: 7 })
+})

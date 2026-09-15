@@ -18,7 +18,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
     throw new Error(`Expected an editable Main component, got ${JSON.stringify(components)}`)
   }
 
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await Locator(`.ComponentStateCard[data-uid="${component.uid}"]`).click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
@@ -47,8 +47,11 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
   if (updatedState.dragOverlay?.width !== 80) {
     throw new Error(`Expected Main drag overlay to update, got ${JSON.stringify(updatedState.dragOverlay)}`)
   }
-  if (updatedState.maxOpenEditorGroups !== Infinity || updatedState.maxOpenEditors !== Infinity) {
-    throw new Error('Expected Main editor limits to survive the JSON round trip')
+  const { maxOpenEditorGroups, maxOpenEditors } = state
+  if (updatedState.maxOpenEditorGroups !== maxOpenEditorGroups || updatedState.maxOpenEditors !== maxOpenEditors) {
+    throw new Error(
+      `Expected Main editor limits to survive the JSON round trip: before=${JSON.stringify([maxOpenEditorGroups, maxOpenEditors])}, after=${JSON.stringify([updatedState.maxOpenEditorGroups, updatedState.maxOpenEditors])}`,
+    )
   }
   const dragOverlayView = Locator('.Main .DragOverlay')
   await expect(dragOverlayView).toBeVisible()

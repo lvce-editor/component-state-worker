@@ -22,6 +22,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
   // Dispatch the menu event directly: the test runner's right-click helper also emits a normal click.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- exercise the component card or DOM event under test
   await card.dispatchEvent('contextmenu', {
     bubbles: true,
     button: 2,
@@ -32,7 +33,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
   const showDom = Locator('.Menu .MenuItem', { hasText: 'Show Dom' })
   await expect(showDom).toBeVisible()
   await expect(showDom).toHaveAttribute('aria-disabled', null)
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await showDom.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

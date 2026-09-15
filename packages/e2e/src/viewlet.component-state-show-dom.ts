@@ -18,6 +18,7 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Ext
     const cardTitle = Locator(`.ComponentStateCard[data-uid="${component.uid}"] .ComponentStateCardTitle`)
     await expect(cardTitle).toBeVisible()
     // Dispatch the menu event directly: the test runner's right-click helper also emits a normal click.
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- exercise the component card or DOM event under test
     await cardTitle.dispatchEvent('contextmenu', {
       bubbles: true,
       button: 2,
@@ -30,7 +31,7 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Ext
     const showDom = Locator('.Menu .MenuItem', { hasText: 'Show Dom' })
     await expect(showDom).toHaveCount(1)
     await expect(showDom).toHaveAttribute('aria-disabled', null)
-    // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+    // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
     await showDom.click()
     await expect(menu2).toBeHidden()
     const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
@@ -49,7 +50,7 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Ext
   }
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()

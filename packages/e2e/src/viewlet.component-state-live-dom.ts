@@ -10,7 +10,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, W
     { content: 'first', uri: `${tmpDir}/a.txt` },
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   const firstItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
   const secondItem = Locator('.Explorer .TreeItem[aria-label="b.txt"]')

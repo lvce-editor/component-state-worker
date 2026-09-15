@@ -8,7 +8,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   await Settings.update({ 'editor.fontFamily': 'monospace', 'editor.lineNumbers': true })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()

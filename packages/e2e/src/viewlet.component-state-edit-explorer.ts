@@ -10,12 +10,20 @@ interface ComponentInfo {
 
 export const name = 'viewlet.component-state-edit-explorer'
 
-export const test: Test = async ({ Command, Editor, expect, Explorer, FileSystem, Locator, Main, Workspace }) => {
+export const test: Test = async ({ Command, Editor, expect, Explorer, FileSystem, Locator, Main, Settings, Workspace }) => {
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json', '', 0)
+  await Command.execute('Layout.handleExtensionsChanged')
+  await Settings.update({ 'editor.fontFamily': 'monospace', 'editor.lineNumbers': 'on' })
   const tmpDir = await FileSystem.getTmpDir()
-  await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await FileSystem.setFiles([
+    { content: 'first', uri: `${tmpDir}/a.txt` },
+    { content: 'second', uri: `${tmpDir}/b.txt` },
+  ])
+  await Workspace.setUri(tmpDir)
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
+  const secondFile = Locator('.Explorer .TreeItem[aria-label="b.txt"]')
+  await expect(secondFile).toBeVisible()
 
   await Command.execute('Developer.openComponentState')
   const componentView = Locator('.ComponentStateView')
@@ -29,7 +37,7 @@ export const test: Test = async ({ Command, Editor, expect, Explorer, FileSystem
 
   const card = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(card).toBeVisible()
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await card.click()
 
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
@@ -44,14 +52,16 @@ export const test: Test = async ({ Command, Editor, expect, Explorer, FileSystem
   const state = JSON.parse(await Editor.getText())
   await Editor.setDeltaY(120)
   const firstVisibleLine = Locator('.Editor .LineNumber').first()
-  await expect(firstVisibleLine).not.toHaveText('1')
+  await expect(firstVisibleLine).toBeVisible()
+  await expect(firstVisibleLine).toHaveText('7')
   await Command.execute('ComponentState.setState', explorer.uid, state)
   await waitForState(
     async () => JSON.parse(await Editor.getText()),
     ({ focusedIndex }) => focusedIndex === 1,
     'unchanged Explorer focusedIndex',
   )
-  await expect(firstVisibleLine).not.toHaveText('1')
+  await expect(firstVisibleLine).toBeVisible()
+  await expect(firstVisibleLine).toHaveText('7')
 
   await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 0 }, null, 2)}\n`)
   await Main.save()

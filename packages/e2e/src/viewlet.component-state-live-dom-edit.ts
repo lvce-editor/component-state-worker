@@ -9,7 +9,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   const firstItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
   await expect(firstItem).toBeVisible()

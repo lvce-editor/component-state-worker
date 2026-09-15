@@ -11,7 +11,7 @@ export const name = 'viewlet.component-state-edit-source-control'
 export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extension, FileSystem, Locator, Main, SideBar, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   const extensionUri = new URL('../fixtures/sample.source-control-save-badge', import.meta.url).href
   await Extension.addWebExtension(extensionUri)
   await Extension.enableWorkspace('sample.source-control-save-badge')
@@ -31,7 +31,7 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
     throw new Error(`Expected an editable Source Control component, got ${JSON.stringify(components)}`)
   }
 
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await Locator(`.ComponentStateCard[data-uid="${component.uid}"]`).click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
@@ -39,6 +39,7 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
   await expect(editorView).toContainText('{')
   const state = JSON.parse(await Editor.getText())
   await Editor.setText(`${JSON.stringify({ ...state, inputSource: 2, inputValue: 'live state commit' }, null, 2)}\n`)
+  await expect(sourceControlInput).toHaveValue('live state commit')
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

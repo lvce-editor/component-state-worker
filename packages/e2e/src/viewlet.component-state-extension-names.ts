@@ -16,10 +16,13 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
   await Extension.enableWorkspace('sample.component-state-extension-names')
   await ActivityBar.handleExtensionsChanged()
 
+  const activation = await Command.execute('ExtensionManagement.activateByEvent', 'onView:sample.component-state-hetzner', '', 0)
+  if (activation.error) throw activation.error
+
   for (const title of ['Hetzner', 'Notes']) {
     const activityBarItem = Locator(`.ActivityBarItem[title="${title}"]`)
     await expect(activityBarItem).toBeVisible()
-    // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+    // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
     await activityBarItem.click()
     const components = await waitForState(
       async () => (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[],
@@ -31,13 +34,13 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
     await Command.execute('Developer.openComponentState')
     const componentView = Locator('.ComponentStateView')
     await expect(componentView).toBeVisible()
-    // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+    // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
     await Locator('.ComponentStateView button[aria-label="Refresh"]').click()
 
     const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
     await expect(card).toBeVisible()
     await expect(card.locator('.ComponentStateCardTitle')).toHaveText(`${title} (extension)`)
-    // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+    // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
     await card.click()
     const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
     await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

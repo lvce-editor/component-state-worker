@@ -10,7 +10,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Q
     { content: 'first', uri: `${tmpDir}/a.txt` },
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   await Command.execute('Developer.openComponentState')
   const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]

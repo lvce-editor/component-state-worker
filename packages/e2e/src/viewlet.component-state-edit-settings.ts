@@ -19,7 +19,7 @@ export const test: Test = async ({ Command, Editor, expect, KeyBoard, Locator, M
     throw new Error(`Expected an editable Settings component, got ${JSON.stringify(components)}`)
   }
 
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await Locator(`.ComponentStateCard[data-uid="${component.uid}"]`).click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
@@ -45,9 +45,10 @@ export const test: Test = async ({ Command, Editor, expect, KeyBoard, Locator, M
   const settingsSearch = Locator('[name="SettingsSearch"]')
   await expect(settingsSearch).toHaveValue('editor')
   const searchInput = Locator('[name="SettingsSearch"]')
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await searchInput.click()
   await KeyBoard.press('Control+A')
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- exercise live updates from the Settings input
   await searchInput.type('font')
   const refreshedState = await Command.execute('ComponentState.getState', component.uid)
   if (refreshedState.searchValue !== 'font') {

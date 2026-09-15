@@ -20,6 +20,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
   const titleBarLabel = Locator(`.ComponentStateCard[data-uid="${titleBar.uid}"] .ComponentStateCardTitle`)
   await expect(titleBarLabel).toBeVisible()
   // Dispatch the menu event directly: the test runner's right-click helper also emits a normal click.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- exercise the component card or DOM event under test
   await titleBarLabel.dispatchEvent('contextmenu', {
     bubbles: true,
     button: 2,
@@ -38,6 +39,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
 
   const statusBarLabel = Locator(`.ComponentStateCard[data-uid="${statusBar.uid}"] .ComponentStateCardStatus`)
   await expect(statusBarLabel).toBeVisible()
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- exercise the component card or DOM event under test
   await statusBarLabel.dispatchEvent('contextmenu', {
     bubbles: true,
     button: 2,
@@ -47,7 +49,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
   } as unknown as string)
   const showDom = Locator('.Menu .MenuItem', { hasText: 'Show Dom' })
   await expect(showDom).toBeVisible()
-  // eslint-disable-next-line e2e/no-direct-click -- verifies the component state card, menu, or input interaction
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies the component state card, menu, or input interaction
   await showDom.click()
   await expect(menu2).toBeHidden()
   await expect(selectedTabTitle).toHaveText(`${statusBar.uid}.json`)

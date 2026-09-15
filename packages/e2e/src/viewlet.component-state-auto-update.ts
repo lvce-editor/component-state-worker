@@ -11,7 +11,7 @@ export const name = 'viewlet.component-state-auto-update'
 export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Command.execute('Layout.showSideBar', 'Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
