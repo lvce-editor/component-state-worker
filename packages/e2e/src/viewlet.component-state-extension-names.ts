@@ -13,6 +13,7 @@ export const name = 'viewlet.component-state-extension-names'
 
 export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extension, Locator }) => {
   await Extension.addWebExtension(new URL('../fixtures/sample.component-state-extension-names/', import.meta.url).href)
+  await Extension.enableWorkspace('sample.component-state-extension-names')
   await ActivityBar.handleExtensionsChanged()
 
   for (const title of ['Hetzner', 'Notes']) {

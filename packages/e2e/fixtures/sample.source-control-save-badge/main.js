@@ -1,48 +1,25 @@
-const currentUrl = new URL(import.meta.url)
-const assetDir = currentUrl.pathname.startsWith('/remote/') ? '' : currentUrl.pathname.slice(0, currentUrl.pathname.indexOf('/packages/'))
-const { WebWorkerRpcClient } = await import(`${assetDir}/js/lvce-editor-rpc.js`)
+import { activate, registerCommand, registerSourceControlProvider } from '@lvce-editor/api'
 
+await activate()
 let badgeCount = 1
-
-const commandMap = {
-  'ExtensionApi.executeCommand'() {
-    badgeCount = 0
-  },
-  'ExtensionApi.executeSourceControlGetBadgeCount'() {
+registerSourceControlProvider({
+  id: 'source-control-save-badge',
+  getBadgeCount() {
     return badgeCount
   },
-  'ExtensionApi.executeSourceControlGetFeatures'() {
+  getFeatures() {
     return {}
   },
-  'ExtensionApi.executeSourceControlGetGroups'() {
+  getGroups() {
     return []
   },
-  'ExtensionApi.executeSourceControlIsActive'(_id, scheme) {
+  isActive(scheme) {
     return scheme === 'memfs'
   },
-  'ExtensionApi.getStatusBarItems'() {
-    return []
+})
+registerCommand({
+  id: 'sourceControlSaveBadge.clear',
+  execute() {
+    badgeCount = 0
   },
-  'ExtensionApi.getSourceControlProviderRegistrySnapshot'() {
-    return {
-      providers: [
-        {
-          id: 'source-control-save-badge',
-        },
-      ],
-    }
-  },
-  'ExtensionApi.getViewActions'() {
-    return []
-  },
-  'ExtensionApi.getViewMenuEntries'() {
-    return []
-  },
-  'ExtensionApi.getViewRegistrySnapshot'() {
-    return {
-      views: [],
-    }
-  },
-}
-
-await WebWorkerRpcClient.create({ commandMap })
+})

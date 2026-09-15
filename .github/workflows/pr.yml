@@ -70,37 +70,3 @@ jobs:
       #run: npm run e2e:webkit:headless
       #env:
       # PLAYWRIGHT_BROWSERS_PATH: 0
-
-  status-bar-regression:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run build:static
-      - name: Install Chromium
-        working-directory: packages/e2e
-        run: npx playwright install --with-deps chromium
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-      - name: Saved status bar labels
-        working-directory: packages/e2e
-        run: npm run e2e:headless -- --filter=viewlet.component-state-edit-status-bar 2>&1 | tee status-bar.log
-        shell: bash
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: status-bar-attempt-${{ matrix.attempt }}
-          path: packages/e2e/status-bar.log
-          if-no-files-found: ignore
