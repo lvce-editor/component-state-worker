@@ -71,3 +71,11 @@ test('applies overlapping editor changes in order', async () => {
   await Promise.all([first, second])
   expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.setState', 7, { title: 'Latest', uid: 7 })
 })
+
+test('accepts a new edit after a failed content read', async () => {
+  jest.mocked(EditorWorker.invoke).mockRejectedValueOnce(new Error('read failed'))
+  await expect(handleEditorChanged(99, 'live-component-state:///7.json')).rejects.toThrow('read failed')
+  jest.mocked(EditorWorker.invoke).mockResolvedValueOnce('{"uid":7,"title":"Recovered"}')
+  await handleEditorChanged(99, 'live-component-state:///7.json')
+  expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.setState', 7, { title: 'Recovered', uid: 7 })
+})
