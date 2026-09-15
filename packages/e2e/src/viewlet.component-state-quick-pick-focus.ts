@@ -24,22 +24,14 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Q
   await expect(editorView).toContainText('$schema')
   await Command.execute('QuickPick.showCommands')
   const input = Locator('#QuickPick .InputBox')
-  try {
-    await expect(input).toBeFocused()
-  } catch (error) {
-    throw new Error(`Quick pick focus checkpoint 1: ${error}`)
-  }
+  await expect(input).toBeFocused()
   const editorComponents = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
   const editor = editorComponents.find((component) => component.moduleId === 'Editor' || component.moduleId === 'EditorText')
   if (!editor) {
     throw new Error('Expected an editor component')
   }
   await Command.execute('Viewlet.reload', editor.uid)
-  try {
-    await expect(input).toBeFocused()
-  } catch (error) {
-    throw new Error(`Quick pick focus checkpoint 2: ${error}`)
-  }
+  await expect(input).toBeFocused()
 
   for (const focusedIndex of [1, 0, 1]) {
     const state = await Command.execute('ComponentState.getState', explorer.uid)
@@ -53,24 +45,12 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Main, Q
       `live focusedIndex ${focusedIndex}`,
       2000,
     )
-    try {
-      await expect(input).toBeFocused()
-    } catch (error) {
-      throw new Error(`Quick pick focus checkpoint 3: ${error}`)
-    }
+    await expect(input).toBeFocused()
   }
   // Flush the edited state through the same save path before checking focus again.
   await Command.execute('Main.save')
-  try {
-    await expect(input).toBeFocused()
-  } catch (error) {
-    throw new Error(`Quick pick focus checkpoint 4: ${error}`)
-  }
+  await expect(input).toBeFocused()
   await QuickPick.setValue('>Developer')
   await expect(input).toHaveValue('>Developer')
-  try {
-    await expect(input).toBeFocused()
-  } catch (error) {
-    throw new Error(`Quick pick focus checkpoint 5: ${error}`)
-  }
+  await expect(input).toBeFocused()
 }
