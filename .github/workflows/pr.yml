@@ -55,9 +55,15 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e chromium
         working-directory: ./packages/e2e
-        run: npm run e2e:headless
+        run: npm run e2e:headless -- --trace-renderer-worker
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: component-traces-${{ matrix.os }}
+          path: packages/e2e/renderer-worker-traces
+          if-no-files-found: ignore
       - name: e2e firefox
         working-directory: ./packages/e2e
         run: npm run e2e:firefox:headless
