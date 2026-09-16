@@ -1,4 +1,6 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
+// eslint-disable-next-line e2e/no-imports -- wait for the live state edit to be applied
+import { waitForState } from './_waitForState.ts'
 
 interface ComponentInfo {
   readonly editable: boolean
@@ -50,8 +52,9 @@ export const test: Test = async ({ Command, Editor, expect, KeyBoard, Locator, M
   await KeyBoard.press('Control+A')
   // eslint-disable-next-line @typescript-eslint/no-deprecated -- exercise live updates from the Settings input
   await searchInput.type('font')
-  const refreshedState = await Command.execute('ComponentState.getState', component.uid)
-  if (refreshedState.searchValue !== 'font') {
-    throw new Error(`Expected Settings state to refresh after UI interaction, got ${refreshedState.searchValue}`)
-  }
+  await waitForState(
+    async () => Command.execute('ComponentState.getState', component.uid),
+    (value) => value.searchValue === 'font',
+    'Settings state to refresh after UI interaction',
+  )
 }
