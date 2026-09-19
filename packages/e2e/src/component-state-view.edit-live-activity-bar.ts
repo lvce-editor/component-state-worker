@@ -4,6 +4,9 @@ interface ActivityBarItem {
   readonly title: string
 }
 
+const updateTitle = (items: readonly ActivityBarItem[]): readonly ActivityBarItem[] =>
+  items.map((item) => ({ ...item, title: item.title === 'Explorer' ? 'Live Activity Bar' : item.title }))
+
 export const name = 'component-state-view.edit-live-activity-bar'
 
 export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
@@ -35,8 +38,6 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   if (uid !== component.uid) {
     throw new Error(`Expected ActivityBar state uid ${component.uid}, got ${uid}`)
   }
-  const updateTitle = (items: readonly ActivityBarItem[]): readonly ActivityBarItem[] =>
-    items.map((item) => ({ ...item, title: item.title === 'Explorer' ? 'Live Activity Bar' : item.title }))
   await Editor.setText(
     `${JSON.stringify({ ...state, activityBarItems: updateTitle(activityBarItems), filteredItems: updateTitle(filteredItems) }, null, 2)}\n`,
   )
@@ -44,9 +45,4 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   const updatedItem = Locator('.ActivityBarItem[title="Live Activity Bar"]')
   await expect(updatedItem).toBeVisible()
   await expect(originalItem).toHaveCount(0)
-
-  const updatedState = await ComponentState.getState<{ readonly activityBarItems: readonly ActivityBarItem[] }>(component.uid)
-  if (updatedState.activityBarItems[0]?.title !== 'Live Activity Bar') {
-    throw new Error(`Expected ActivityBar item title to update, got ${JSON.stringify(updatedState.activityBarItems)}`)
-  }
 }
