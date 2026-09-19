@@ -35,7 +35,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   if (uid !== component.uid) {
     throw new Error(`Expected ActivityBar state uid ${component.uid}, got ${uid}`)
   }
-  const updateTitle = (items: readonly ActivityBarItem[]) =>
+  const updateTitle = (items: readonly ActivityBarItem[]): readonly ActivityBarItem[] =>
     items.map((item) => ({ ...item, title: item.title === 'Explorer' ? 'Live Activity Bar' : item.title }))
   await Editor.setText(
     `${JSON.stringify({ ...state, activityBarItems: updateTitle(activityBarItems), filteredItems: updateTitle(filteredItems) }, null, 2)}\n`,
