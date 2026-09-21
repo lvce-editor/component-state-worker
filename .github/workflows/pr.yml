@@ -97,7 +97,7 @@ jobs:
           npm run e2e:headless -- --filter=component-state-view.edit-save-explorer 2>&1 | tee e2e.log
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: explorer-save-${{ matrix.attempt }}
