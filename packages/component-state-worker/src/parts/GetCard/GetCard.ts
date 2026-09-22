@@ -24,6 +24,10 @@ const statusNode: VirtualDomNode = {
 
 export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => {
   const status = component.editable ? ComponentStateStrings.openJsonState() : ComponentStateStrings.stateApiUnavailable()
+  const uid =
+    typeof component.stateSize === 'number'
+      ? ComponentStateStrings.uidWithSize(component.uid, component.stateSize)
+      : ComponentStateStrings.uid(component.uid)
   return [
     {
       childCount: 3,
@@ -40,7 +44,7 @@ export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => 
     titleNode,
     text(component.displayName || component.moduleId),
     uidNode,
-    text(ComponentStateStrings.uid(component.uid)),
+    text(uid),
     statusNode,
     text(status),
   ]

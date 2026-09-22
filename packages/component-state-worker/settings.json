@@ -6,5 +6,13 @@
     "id": "componentStateView.showUnavailableComponents",
     "type": "boolean",
     "value": false
+  },
+  {
+    "category": "features",
+    "description": "Controls whether JSON.stringify(state).length is shown next to each component UID. The value is the serialized JavaScript string length (UTF-16 code units), not the encoded byte size.",
+    "heading": "Show Component State Size",
+    "id": "componentStateView.showStateSize",
+    "type": "boolean",
+    "value": false
   }
 ]
