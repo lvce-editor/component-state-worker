@@ -17,6 +17,7 @@ export const handleContextMenu = async (
   await MenuWorker.show2(viewUid, MenuEntryId.ComponentState, x, y, {
     componentUid,
     domAvailable: component.domAvailable,
+    heapSnapshotAvailable: component.heapSnapshotAvailable === true,
   })
   return state
 }

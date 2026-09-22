@@ -241,7 +241,11 @@ test('opens a context menu for the right-clicked component without opening its s
   await expect(handleContextMenu(state, '0.25', 120, 240)).resolves.toBe(state)
   expect(RendererWorker.invoke).not.toHaveBeenCalled()
   expect(MenuWorker.show2).toHaveBeenCalledTimes(1)
-  expect(MenuWorker.show2).toHaveBeenCalledWith(7, 34, 120, 240, { componentUid: 0.25, domAvailable: true })
+  expect(MenuWorker.show2).toHaveBeenCalledWith(7, 34, 120, 240, {
+    componentUid: 0.25,
+    domAvailable: true,
+    heapSnapshotAvailable: false,
+  })
 })
 
 test('ignores unavailable or unknown context-menu targets', async () => {
