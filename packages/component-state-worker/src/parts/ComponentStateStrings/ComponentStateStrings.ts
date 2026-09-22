@@ -25,6 +25,10 @@ export const uid = (value: number): string => {
   return i18nString(UiStrings.Uid, { PH1: value })
 }
 
+export const uidWithSize = (uid: number, size: number): string => {
+  return i18nString(UiStrings.UidWithSize, { PH1: uid, PH2: size })
+}
+
 export const liveComponents = (value: number): string => {
   return i18nString(UiStrings.LiveComponents, { PH1: value })
 }

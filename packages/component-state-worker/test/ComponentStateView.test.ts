@@ -61,6 +61,7 @@ test('hides unavailable components by default', async () => {
 
   await expect(loadContent(initial)).resolves.toMatchObject({ components: [components[0]], loaded: true })
   expect(RendererWorker.getPreference).toHaveBeenCalledWith('componentStateView.showUnavailableComponents')
+  expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
 })
 
 test('shows unavailable components when configured', async () => {
@@ -74,6 +75,58 @@ test('shows unavailable components when configured', async () => {
   const initial = ComponentStateViewStates.get(7).newState
 
   await expect(loadContent(initial)).resolves.toMatchObject({ components, loaded: true })
+})
+
+test('loads component state sizes only when configured', async () => {
+  const components = [
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
+  ]
+  const state = { focusedIndex: 2, uid: 9 }
+  jest.mocked(RendererWorker.invoke).mockResolvedValueOnce(components).mockResolvedValueOnce(state)
+  jest.mocked(RendererWorker.getPreference).mockResolvedValue(true)
+  create(7, 1, 2, 300, 400)
+  const initial = ComponentStateViewStates.get(7).newState
+
+  await expect(loadContent(initial)).resolves.toMatchObject({
+    components: [{ ...components[0], stateSize: JSON.stringify(state).length }, components[1]],
+    loaded: true,
+  })
+  expect(RendererWorker.invoke).toHaveBeenNthCalledWith(1, 'ComponentState.getComponents', 7)
+  expect(RendererWorker.invoke).toHaveBeenNthCalledWith(2, 'ComponentState.getState', 9)
+})
+
+test('keeps components usable when loading a component state size fails', async () => {
+  const components = [
+    { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
+    { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
+  ]
+  jest.mocked(RendererWorker.invoke).mockResolvedValueOnce(components).mockRejectedValueOnce(new Error('state unavailable'))
+  jest.mocked(RendererWorker.getPreference).mockResolvedValue(true)
+  create(7, 1, 2, 300, 400)
+  const initial = ComponentStateViewStates.get(7).newState
+
+  await expect(loadContent(initial)).resolves.toMatchObject({ components, loaded: true })
+  expect(RendererWorker.invoke).toHaveBeenCalledTimes(2)
+})
+
+test('refreshes component state sizes once for the refreshed component list', async () => {
+  const components = [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 }]
+  const state = { focusedIndex: 2, uid: 9 }
+  jest
+    .mocked(RendererWorker.invoke)
+    .mockResolvedValueOnce(components)
+    .mockResolvedValueOnce(state)
+    .mockResolvedValueOnce(components)
+    .mockResolvedValueOnce(state)
+  jest.mocked(RendererWorker.getPreference).mockImplementation(async (key) => key === 'componentStateView.showStateSize')
+  create(7, 1, 2, 300, 400)
+  const initial = ComponentStateViewStates.get(7).newState
+
+  const loaded = await loadContent(initial)
+  await expect(refresh(loaded)).resolves.toMatchObject({ components: [{ ...components[0], stateSize: JSON.stringify(state).length }] })
+  expect(RendererWorker.invoke).toHaveBeenNthCalledWith(2, 'ComponentState.getState', 9)
+  expect(RendererWorker.invoke).toHaveBeenNthCalledWith(4, 'ComponentState.getState', 9)
 })
 
 test('refreshes the live component list', async () => {
@@ -187,6 +240,18 @@ test('renders editable and unavailable component cards', () => {
       params: [],
     },
   ])
+})
+
+test('renders a component state size next to the uid', () => {
+  const stateSize = JSON.stringify({ focusedIndex: 2, uid: 1 }).length
+  const dom = getComponentStateVirtualDom(
+    [{ displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', stateSize, uid: 1 }],
+    true,
+    1,
+  )
+
+  const uidNodeIndex = dom.findIndex((node) => node.className === 'ComponentStateCardUid')
+  expect(dom[uidNodeIndex + 1]).toMatchObject({ text: `uid 1 (${stateSize} bytes)` })
 })
 
 test('renders distinct extension display names and falls back to module ids', () => {
