@@ -90,11 +90,17 @@ jobs:
         working-directory: packages/e2e
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
+      - run: node scripts/capture-source-control-state.mjs
       - name: Reproduce live Source Control state
         shell: bash
         run: |
           set -o pipefail
-          npm run e2e:headless 2>&1 | tee e2e.log
+          failed=0
+          for repetition in {1..10}; do
+            echo "Source Control capture repetition $repetition" | tee -a e2e.log
+            npm run e2e:headless --workspace=packages/e2e -- --filter=component-state-view.edit-live-source-control 2>&1 | tee -a e2e.log || failed=1
+          done
+          exit "$failed"
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - uses: actions/upload-artifact@v7
