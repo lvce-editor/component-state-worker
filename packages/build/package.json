@@ -6,7 +6,7 @@
   "devDependencies": {
     "@babel/preset-typescript": "^7.28.5",
     "@lvce-editor/explorer-view": "7.44.4",
-    "@lvce-editor/server": "0.116.0",
+    "@lvce-editor/server": "0.116.14",
     "@lvce-editor/status-bar-worker": "3.30.3",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
