@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, windows-2025]
+        os: [windows-2025]
+        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -28,10 +29,11 @@ jobs:
         id: npm-cache
         with:
           path: '**/node_modules'
-          key: ${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+          key: diagnostic-extension-rpc-${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: node packages/build/src/diagnoseExtensionTab.ts
       - run: npm run build
       - run: npm run build:static
       - run: npm test
@@ -70,3 +72,9 @@ jobs:
       #run: npm run e2e:webkit:headless
       #env:
       # PLAYWRIGHT_BROWSERS_PATH: 0
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: extension-tab-${{ matrix.attempt }}
+          path: packages/e2e/.tmp/extension-tab-*.json
+          include-hidden-files: true
