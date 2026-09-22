@@ -21,7 +21,7 @@ export const test: Test = async ({
   ])
   // Keep this component-state test independent of browser-specific font loading behavior.
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
 
   const firstExplorerItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')

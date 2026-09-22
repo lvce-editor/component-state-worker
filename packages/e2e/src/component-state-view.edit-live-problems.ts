@@ -23,7 +23,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   await expect(card).toBeVisible()
   await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Problems')
   await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

@@ -14,7 +14,7 @@ const parseState = (content: string): Record<string, unknown> | undefined => {
   }
 }
 
-export const handleEditorChanged = async (editorUid: number, uri: string): Promise<void> => {
+const applyEditorChanged = async (editorUid: number, uri: string): Promise<void> => {
   const isDom = LiveComponentDomUri.is(uri)
   let componentUid: number
   try {
@@ -39,4 +39,37 @@ export const handleEditorChanged = async (editorUid: number, uri: string): Promi
     return
   }
   await RendererWorker.invoke('ComponentState.setState', componentUid, RemoveSchemaProperty.removeSchemaProperty(state))
+}
+
+interface PendingChange {
+  promise: Promise<void>
+  rerun: boolean
+  uri: string
+}
+
+const pendingChanges = new Map<number, PendingChange>()
+
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- shared pending work is updated by subsequent editor notifications
+const applyPendingChanges = async (editorUid: number, pending: PendingChange): Promise<void> => {
+  try {
+    while (pending.rerun) {
+      pending.rerun = false
+      await applyEditorChanged(editorUid, pending.uri)
+    }
+  } finally {
+    pendingChanges.delete(editorUid)
+  }
+}
+
+export const handleEditorChanged = (editorUid: number, uri: string): Promise<void> => {
+  const current = pendingChanges.get(editorUid)
+  if (current) {
+    current.uri = uri
+    current.rerun = true
+    return current.promise
+  }
+  const pending: PendingChange = { promise: Promise.resolve(), rerun: true, uri }
+  pendingChanges.set(editorUid, pending)
+  pending.promise = applyPendingChanges(editorUid, pending)
+  return pending.promise
 }
