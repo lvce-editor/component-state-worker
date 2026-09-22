@@ -44,7 +44,6 @@ export const test: Test = async ({
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
   const state = JSON.parse(await Editor.getText())
-  delete state.__stateTrace
   const { id } = state
   if (id !== component.uid) {
     throw new Error(`Expected Source Control state id ${component.uid}, got ${id}`)
@@ -55,6 +54,6 @@ export const test: Test = async ({
 
   const updatedState = await ComponentState.getState<{ readonly providerUnavailableMessage: string }>(component.uid)
   if (updatedState.providerUnavailableMessage !== 'Live source control message') {
-    throw new Error(`Expected Source Control message to update, got ${JSON.stringify(updatedState)}`)
+    throw new Error(`Expected Source Control message to update, got ${updatedState.providerUnavailableMessage}`)
   }
 }
