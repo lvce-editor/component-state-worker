@@ -90,29 +90,11 @@ jobs:
         working-directory: packages/e2e
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - uses: actions/checkout@v7
-        with:
-          repository: lvce-editor/source-control-view
-          ref: ac10ccf614cf7f1e69a240780ccea951e8c4ca11
-          path: .tmp/source-control-candidate
-          persist-credentials: false
-      - run: npm ci && npm run build
-        working-directory: .tmp/source-control-candidate
-      - name: Install exact candidate worker bundle
-        shell: bash
-        run: |
-          test "$(git -C .tmp/source-control-candidate rev-parse HEAD)" = ac10ccf614cf7f1e69a240780ccea951e8c4ca11
-          cp .tmp/source-control-candidate/.tmp/dist/dist/* node_modules/@lvce-editor/static-server/static/e271222/packages/source-control-worker/dist/
-      - name: Reproduce live Source Control state
+      - name: Validate published Source Control repair
         shell: bash
         run: |
           set -o pipefail
-          failed=0
-          for repetition in {1..10}; do
-            echo "Source Control candidate repetition $repetition" | tee -a e2e.log
-            npm run e2e:headless --workspace=packages/e2e -- --filter=component-state-view.edit-live-source-control 2>&1 | tee -a e2e.log || failed=1
-          done
-          exit "$failed"
+          npm run e2e:headless 2>&1 | tee e2e.log
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - uses: actions/upload-artifact@v7
