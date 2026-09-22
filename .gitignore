@@ -6,3 +6,6 @@ node_modules
 *.log
 *.tsbuildinfo
 *.tgz
+
+packages/e2e/fixtures/sample.component-state-extension-names/rpc.js
+packages/e2e/fixtures/*/main.bundle.js
