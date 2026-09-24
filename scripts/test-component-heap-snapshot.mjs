@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../.tmp/lvce-editor')
 const requireTests = createRequire(join(root, 'packages/extension-host-worker-tests/package.json'))
+const requireMain = createRequire(join(root, 'packages/main-process/package.json'))
 const requireBuild = createRequire(join(root, 'packages/build/package.json'))
 const { _electron } = requireTests('playwright')
 const { expect } = requireTests('@playwright/test')
@@ -39,7 +40,7 @@ try {
   delete env.ELECTRON_RUN_AS_NODE
   for (const key of ['CONFIG', 'DATA', 'STATE', 'CACHE']) env[`XDG_${key}_HOME`] = join(profile, key.toLowerCase())
   app = await _electron.launch({
-    executablePath: join(root, 'packages/main-process/node_modules/electron/dist/electron'),
+    executablePath: requireMain('electron'),
     args: ['--no-sandbox', '--disable-http-cache', `--user-data-dir=${join(profile, 'chromium')}`, '.', profile],
     cwd: join(root, 'packages/main-process'),
     env,
