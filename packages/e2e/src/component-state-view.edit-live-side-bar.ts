@@ -1,7 +1,6 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.edit-live-side-bar'
-export const skip = 1
 
 export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings, SideBar }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
