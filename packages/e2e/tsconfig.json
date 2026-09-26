@@ -23,5 +23,5 @@
     "noUnusedParameters": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["scripts", "src"]
+  "include": ["scripts", "src", "saved-state"]
 }

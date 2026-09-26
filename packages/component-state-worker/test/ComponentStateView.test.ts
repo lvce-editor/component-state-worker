@@ -27,6 +27,7 @@ const MenuWorker = await import('../src/parts/MenuWorker/MenuWorker.ts')
 const { RendererWorker } = await import('@lvce-editor/rpc-registry')
 const { handleContextMenu } = await import('../src/parts/HandleContextMenu/HandleContextMenu.ts')
 const { showDom } = await import('../src/parts/ShowDom/ShowDom.ts')
+const { showSavedState } = await import('../src/parts/ShowSavedState/ShowSavedState.ts')
 const { handleClick } = await import('../src/parts/HandleClick/HandleClick.ts')
 const { loadContent } = await import('../src/parts/LoadContent/LoadContent.ts')
 const { refresh } = await import('../src/parts/Refresh/Refresh.ts')
@@ -53,13 +54,14 @@ test('hides unavailable components by default', async () => {
   const components = [
     { displayName: 'Explorer', domAvailable: true, editable: true, moduleId: 'Explorer', uid: 9 },
     { displayName: 'Editor', domAvailable: true, editable: false, moduleId: 'Editor', uid: 10 },
+    { displayName: 'Secrets', domAvailable: false, editable: false, moduleId: 'Secrets', savedStateAvailable: true, uid: 11 },
   ]
   jest.mocked(RendererWorker.invoke).mockResolvedValue(components)
   jest.mocked(RendererWorker.getPreference).mockResolvedValue(false)
   create(7, 1, 2, 300, 400)
   const initial = ComponentStateViewStates.get(7).newState
 
-  await expect(loadContent(initial)).resolves.toMatchObject({ components: [components[0]], loaded: true })
+  await expect(loadContent(initial)).resolves.toMatchObject({ components: [components[0], components[2]], loaded: true })
   expect(RendererWorker.getPreference).toHaveBeenCalledWith('componentStateView.showUnavailableComponents')
   expect(RendererWorker.invoke).toHaveBeenCalledTimes(1)
 })
@@ -158,7 +160,10 @@ test('returns no diff or render commands for unchanged state', () => {
 test('opens the selected component state uri', async () => {
   const invoke = jest.mocked(RendererWorker.invoke).mockResolvedValue(undefined)
   create(7, 0, 0, 100, 100)
-  const state = ComponentStateViewStates.get(7).newState
+  const state = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: [{ displayName: 'Explorer', domAvailable: false, editable: true, moduleId: 'Explorer', uid: 42 }],
+  }
 
   await expect(handleClick(state, '42')).resolves.toBe(state)
   expect(invoke).toHaveBeenCalledWith('Application.executeForView', 7, 'Main.openUri', 'live-component-state:///42.json')
@@ -310,6 +315,7 @@ test('opens a context menu for the right-clicked component without opening its s
     componentUid: 0.25,
     domAvailable: true,
     heapSnapshotAvailable: false,
+    savedStateAvailable: false,
   })
 })
 
@@ -325,6 +331,21 @@ test('ignores unavailable or unknown context-menu targets', async () => {
   expect(RendererWorker.invoke).not.toHaveBeenCalled()
 })
 
+test('opens the context menu for saved-state-only components', async () => {
+  create(7, 0, 0, 100, 100)
+  const state = {
+    ...ComponentStateViewStates.get(7).newState,
+    components: [{ displayName: 'Editor', domAvailable: false, editable: false, moduleId: 'Editor', savedStateAvailable: true, uid: 9 }],
+  }
+  await expect(handleContextMenu(state, '9', 0, 0)).resolves.toBe(state)
+  expect(MenuWorker.show2).toHaveBeenCalledWith(7, 34, 0, 0, {
+    componentUid: 9,
+    domAvailable: false,
+    heapSnapshotAvailable: false,
+    savedStateAvailable: true,
+  })
+})
+
 test('opens the selected component DOM uri', async () => {
   create(7, 0, 0, 100, 100)
   const state = ComponentStateViewStates.get(7).newState
@@ -334,6 +355,18 @@ test('opens the selected component DOM uri', async () => {
     7,
     'Main.openUri',
     'live-component-state:///dom/0.25.json',
+  )
+})
+
+test('opens the selected saved-state uri', async () => {
+  create(7, 0, 0, 100, 100)
+  const state = ComponentStateViewStates.get(7).newState
+  await expect(showSavedState(state, 0.25)).resolves.toBe(state)
+  expect(RendererWorker.invoke).toHaveBeenCalledWith(
+    'Application.executeForView',
+    7,
+    'Main.openUri',
+    'live-component-state:///saved/0.25.json',
   )
 })
 
@@ -385,20 +418,23 @@ test('ignores secondary pointer buttons and clears drag data for unavailable or 
 })
 
 test('keeps requests from two component inspectors tied to their own view', async () => {
-  jest.mocked(RendererWorker.invoke).mockResolvedValue([])
+  jest.mocked(RendererWorker.invoke).mockResolvedValue([
+    { displayName: 'Main', editable: true, moduleId: 'Main', uid: 101 },
+    { displayName: 'Main', editable: true, moduleId: 'Main', uid: 201 },
+  ])
   for (const uid of [100, 200, 100]) {
     create(uid, 0, 0, 100, 100)
     const state = ComponentStateViewStates.get(uid).newState
-    await loadContent(state)
+    const loadedState = await loadContent(state)
     expect(RendererWorker.invoke).toHaveBeenLastCalledWith('ComponentState.getComponents', uid)
-    await handleClick(state, String(uid + 1))
+    await handleClick(loadedState, String(uid + 1))
     expect(RendererWorker.invoke).toHaveBeenLastCalledWith(
       'Application.executeForView',
       uid,
       'Main.openUri',
       `live-component-state:///${uid + 1}.json`,
     )
-    await showDom(state, uid + 1)
+    await showDom(loadedState, uid + 1)
     expect(RendererWorker.invoke).toHaveBeenLastCalledWith(
       'Application.executeForView',
       uid,

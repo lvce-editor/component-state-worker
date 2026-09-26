@@ -114,6 +114,38 @@ test('reads formatted virtual DOM and registers the editor listener', async () =
   expect(RendererWorker.invoke).toHaveBeenCalledWith('ComponentState.getDom', 0.25)
 })
 
+test('reads saved state as a formatted inspection snapshot without registering editor writes', async () => {
+  const savedState = { nested: { value: 2 }, uid: 7 }
+  jest.mocked(RendererWorker.invoke).mockResolvedValue(savedState)
+
+  await expect(FileSystem.readFile('live-component-state:///saved/7.json')).resolves.toBe(`${JSON.stringify(savedState, null, 2)}\n`)
+  expect(RendererWorker.invoke).toHaveBeenCalledWith('ComponentState.getSavedState', 7)
+  expect(EditorWorker.invoke).not.toHaveBeenCalled()
+})
+
+test('treats saved-state files as read-only and checks saved-state capability independently of editability', async () => {
+  jest.mocked(RendererWorker.getComponents).mockResolvedValue([
+    { displayName: 'Editor', editable: false, savedStateAvailable: true, uid: 7 },
+    { displayName: 'Unsupported', editable: false, savedStateAvailable: false, uid: 8 },
+  ] as unknown as Awaited<ReturnType<typeof RendererWorker.getComponents>>)
+
+  expect(FileSystem.isReadonly('live-component-state:///saved/7.json')).toBe(true)
+  await expect(FileSystem.exists('live-component-state:///saved/7.json')).resolves.toBe(true)
+  await expect(FileSystem.exists('live-component-state:///saved/8.json')).resolves.toBe(false)
+  await expect(FileSystem.writeFile('live-component-state:///saved/7.json', '{"uid":7}')).rejects.toThrow(
+    'Saved component state is read-only',
+  )
+  expect(RendererWorker.invoke).not.toHaveBeenCalled()
+})
+
+test('rejects saved-state results that are not JSON serializable', async () => {
+  jest.mocked(RendererWorker.invoke).mockResolvedValue(undefined)
+
+  await expect(FileSystem.readFile('live-component-state:///saved/7.json')).rejects.toThrow(
+    'Saved component state cannot be serialized as JSON',
+  )
+})
+
 test('treats DOM files as writable and checks the component exists', async () => {
   jest
     .mocked(RendererWorker.getComponents)

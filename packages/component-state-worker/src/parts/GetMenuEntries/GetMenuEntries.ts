@@ -7,8 +7,21 @@ export const getMenuEntries = (
     componentUid,
     domAvailable = true,
     heapSnapshotAvailable = false,
-  }: { readonly componentUid: number; readonly domAvailable?: boolean; readonly heapSnapshotAvailable?: boolean },
+    savedStateAvailable = false,
+  }: {
+    readonly componentUid: number
+    readonly domAvailable?: boolean
+    readonly heapSnapshotAvailable?: boolean
+    readonly savedStateAvailable?: boolean
+  },
 ): readonly any[] => [
+  {
+    args: [componentUid],
+    command: 'ComponentState.showSavedState',
+    flags: savedStateAvailable ? MenuItemFlags.None : MenuItemFlags.Disabled,
+    id: 'showSavedState',
+    label: ComponentStateStrings.showSavedState(),
+  },
   {
     args: [componentUid],
     command: 'ComponentState.showDom',
