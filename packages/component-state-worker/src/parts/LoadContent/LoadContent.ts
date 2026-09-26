@@ -32,7 +32,8 @@ export const loadContent = async (state: ComponentStateViewState): Promise<Compo
     RendererWorker.getPreference('componentStateView.showUnavailableComponents'),
     RendererWorker.getPreference('componentStateView.showStateSize'),
   ])
-  const visibleComponents = showUnavailableComponents === true ? components : components.filter((component) => component.editable)
+  const visibleComponents =
+    showUnavailableComponents === true ? components : components.filter((component) => component.editable || component.savedStateAvailable)
   const loadedComponents = showStateSize === true ? await getComponentsWithStateSizes(visibleComponents) : visibleComponents
   return {
     ...state,

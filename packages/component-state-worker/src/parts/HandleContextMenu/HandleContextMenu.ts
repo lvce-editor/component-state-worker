@@ -10,7 +10,7 @@ export const handleContextMenu = async (
 ): Promise<ComponentStateViewState> => {
   const { components, uid: viewUid } = state
   const componentUid = Number(uid)
-  const component = components.find((item) => item.uid === componentUid && item.editable)
+  const component = components.find((item) => item.uid === componentUid && (item.editable || item.savedStateAvailable))
   if (!component) {
     return state
   }
@@ -18,6 +18,7 @@ export const handleContextMenu = async (
     componentUid,
     domAvailable: component.domAvailable,
     heapSnapshotAvailable: component.heapSnapshotAvailable === true,
+    savedStateAvailable: component.savedStateAvailable === true,
   })
   return state
 }
