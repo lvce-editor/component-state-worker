@@ -13,7 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
-        attempt: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        attempt: [1, 2]
+        browser: [chromium, firefox]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -21,74 +22,22 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-      - name: Compute node modules cache key
-        id: nodeModulesCacheKey
-        run: echo "value=$(node packages/build/src/computeNodeModulesCacheKey.ts)" >> $GITHUB_OUTPUT
-        shell: bash
-      - uses: actions/cache@v6
-        id: npm-cache
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ runner.arch }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
-      - name: npm ci
-        run: npm ci
-        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm ci
+      - run: node scripts/trace-activity-bar.mjs
       - run: npm run build
-      - run: npm run build:static
-      - run: npm test
-      - run: npm run type-check
-      - run: npm run lint
-      - name: install playwright system dependencies
+      - name: Install browser
         working-directory: ./packages/e2e
-        if: runner.os == 'Linux'
-        run: sudo npx playwright install-deps chromium firefox webkit
-      - name: install playwright browsers
-        working-directory: ./packages/e2e
-        run: npx playwright install chromium firefox
-        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps ${{ matrix.browser }}
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
-      - name: install playwright webkit
-        working-directory: ./packages/e2e
-        if: runner.os != 'Windows'
-        run: npx playwright install webkit
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-      - name: e2e chromium
-        id: chromium
-        working-directory: ./packages/e2e
-        run: npm run e2e:headless 2>&1 | tee e2e-chromium.log
-        shell: bash
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-      - name: e2e firefox
-        if: success() || failure() && steps.chromium.outcome == 'failure'
-        working-directory: ./packages/e2e
-        run: npm run e2e:firefox:headless 2>&1 | tee e2e-firefox.log
-        shell: bash
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-      #- name: e2e webkit
-      # Playwright's Windows WebKit worker does not expose OffscreenCanvas.
-      # if: runner.os != 'Windows'
-      #working-directory: ./packages/e2e
-      #run: npm run e2e:webkit:headless
-      #env:
-      # PLAYWRIGHT_BROWSERS_PATH: 0
-
       - name: Trace ActivityBar editing
-        if: success() || failure() && steps.chromium.outcome == 'failure'
         working-directory: ./packages/e2e
-        run: npm run e2e -- --headless --filter=component-state-view.edit-live-activity-bar --trace-renderer-worker
+        run: npm run e2e -- --headless --browser=${{ matrix.browser }} --filter=component-state-view.edit-live-activity-bar --trace-renderer-worker
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: Upload attempt results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-attempt-${{ matrix.attempt }}
-          path: |
-            packages/e2e/*.log
-            packages/e2e/screenshots/
-            packages/e2e/test-results/
-            packages/e2e/renderer-worker-traces/
+          name: activity-diagnostic-${{ matrix.browser }}-${{ matrix.attempt }}
+          path: packages/e2e/renderer-worker-traces/
