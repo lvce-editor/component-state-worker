@@ -55,13 +55,14 @@ jobs:
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e chromium
+        id: chromium
         working-directory: ./packages/e2e
         run: npm run e2e:headless 2>&1 | tee e2e-chromium.log
         shell: bash
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
       - name: e2e firefox
-        if: always()
+        if: success() || failure() && steps.chromium.outcome == 'failure'
         working-directory: ./packages/e2e
         run: npm run e2e:firefox:headless 2>&1 | tee e2e-firefox.log
         shell: bash
@@ -77,7 +78,7 @@ jobs:
 
       - name: Upload attempt results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-attempt-${{ matrix.attempt }}
           path: |
