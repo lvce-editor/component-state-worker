@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 const testRunnerPath = fileURLToPath(
   new URL('../../node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js', import.meta.url),
 )
-const commonArgs = ['--only-extension=../../.tmp/extensions/builtin.language-features-json', '--headless']
+const commonArgs = ['--headless']
 
 const run = (args, env = process.env) =>
   new Promise((resolve) => {
