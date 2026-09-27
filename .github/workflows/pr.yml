@@ -25,6 +25,7 @@ jobs:
       - run: npm ci
       - run: node scripts/trace-activity-bar.mjs
       - run: npm run build
+      - run: npm run build:static
       - name: Install browser
         working-directory: ./packages/e2e
         run: npx playwright install --with-deps ${{ matrix.browser }}
