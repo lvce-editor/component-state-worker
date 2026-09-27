@@ -6,7 +6,7 @@ const entries = (await readdir(staticRoot)).filter((entry) => /^[a-f0-9]{7,40}$/
 if (entries.length !== 1) throw new Error('Expected one pinned static runtime')
 const path = join(staticRoot, entries[0], 'packages/activity-bar-worker/dist/activityBarWorkerMain.js')
 const original = await readFile(path, 'utf8')
-const needle = '        const newerState = await fn(newState, ...args);'
+const needle = '\n        const newerState = await fn(newState, ...args);'
 if (original.split(needle).length !== 2) throw new Error('Expected one ActivityBar command wrapper')
 const prelude = `
 const activityDiagnosticEvents = [];
@@ -22,7 +22,8 @@ MessagePort.prototype.postMessage = function(message, ...rest) {
   return activityDiagnosticPost.call(this, message, ...rest);
 };
 `
-const replacement = `        activityDiagnosticRecord('start', fn.name, newState);
+const replacement = `
+        activityDiagnosticRecord('start', fn.name, newState);
         const newerState = await fn(newState, ...args);
         activityDiagnosticRecord('finish', fn.name, newerState);`
 await writeFile(path, prelude + original.replace(needle, replacement))
