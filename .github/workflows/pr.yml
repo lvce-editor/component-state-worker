@@ -76,6 +76,12 @@ jobs:
       #env:
       # PLAYWRIGHT_BROWSERS_PATH: 0
 
+      - name: Trace ActivityBar editing
+        if: success() || failure() && steps.chromium.outcome == 'failure'
+        working-directory: ./packages/e2e
+        run: npm run e2e -- --headless --filter=component-state-view.edit-live-activity-bar --trace-renderer-worker
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
       - name: Upload attempt results
         if: always()
         uses: actions/upload-artifact@v7
@@ -85,3 +91,4 @@ jobs:
             packages/e2e/*.log
             packages/e2e/screenshots/
             packages/e2e/test-results/
+            packages/e2e/renderer-worker-traces/
