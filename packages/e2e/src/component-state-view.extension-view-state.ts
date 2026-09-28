@@ -34,7 +34,7 @@ export const test: Test = async ({ ActivityBar, ComponentState, Developer, Edito
   await extensionViewCard.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${extensionView.uid}.json`)
-  const state = (await Editor.getTextAsJson()) as ExtensionViewState
+  const state = await Editor.getTextAsJson<ExtensionViewState>()
   const { count: initialCount } = state
   if (initialCount !== 1) {
     throw new Error(`Expected extension view count to be 1, got ${initialCount}`)
