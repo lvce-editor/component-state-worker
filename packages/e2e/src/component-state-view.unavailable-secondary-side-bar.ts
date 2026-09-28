@@ -15,7 +15,9 @@ export const test: Test = async ({ ComponentState, Developer, expect, Locator, S
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
-  await expect(card.locator('.ComponentStateCardTitle')).toHaveText('SecondarySideBar')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('State API unavailable')
+  const cardTitle = card.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('SecondarySideBar')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('State API unavailable')
   await expect(card).toHaveAttribute('disabled', '')
 }

@@ -25,9 +25,11 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspa
     if (editableComponents.length === 0) {
       throw new Error('Expected live components without manually refreshing')
     }
-    await expect(view.locator('.ComponentStateDescription')).toHaveText(`${editableComponents.length} live components`)
+    const description = view.locator('.ComponentStateDescription')
+    await expect(description).toHaveText(`${editableComponents.length} live components`)
     for (const component of editableComponents) {
-      await expect(view.locator(`.ComponentStateCard[data-uid="${component.uid}"]`)).toBeVisible()
+      const card = view.locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
+      await expect(card).toBeVisible()
     }
     return editableComponents
   }
@@ -41,7 +43,8 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspa
   await Command.execute('Layout.showSideBar', 'Search')
   const searchView = Locator('.Search')
   await expect(searchView).toBeVisible()
-  await expect(view.locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)).toHaveCount(0)
+  const explorerCard = view.locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
+  await expect(explorerCard).toHaveCount(0)
   await assertComponents()
 
   await Command.execute('Layout.openSecondarySideBarViewlet', 'Explorer')

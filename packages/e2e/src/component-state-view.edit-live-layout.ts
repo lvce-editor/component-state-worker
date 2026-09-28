@@ -10,7 +10,8 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
     throw new Error('Expected Layout to expose editable component state')
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
   const state = await ComponentState.getState<{ readonly sideBarWidth: number }>(component.uid)
   const { sideBarWidth: originalWidth } = state
   const sideBarWidth = originalWidth === 320 ? 340 : 320

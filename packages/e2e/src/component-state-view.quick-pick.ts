@@ -12,5 +12,6 @@ export const test: Test = async ({ expect, Locator, QuickPick }) => {
 
   const view = Locator('.ComponentStateView')
   await expect(view).toBeVisible()
-  await expect(view.locator('.ComponentStateHeading')).toHaveText('Live Component State')
+  const heading = view.locator('.ComponentStateHeading')
+  await expect(heading).toHaveText('Live Component State')
 }
