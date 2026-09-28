@@ -4,6 +4,7 @@ export interface ComponentInfo {
   readonly editable: boolean
   readonly heapSnapshotAvailable?: boolean
   readonly moduleId: string
+  readonly savedStateAvailable?: boolean
   readonly stateSize?: number
   readonly uid: number
 }
