@@ -34,7 +34,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { items: originalItems, uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected Explorer state uid ${component.uid}, got ${uid}`)
@@ -42,7 +42,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   const items = (originalItems as readonly Item[]).map((item) =>
     item.name === 'original.txt' ? { ...item, name: 'Live explorer label' } : item,
   )
-  await Editor.setText(`${JSON.stringify({ ...state, items }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, items })
   const updatedItem = Locator('.Explorer .TreeItem[aria-label="Live explorer label"]')
   await expect(updatedItem).toBeVisible()
   await expect(originalItem).toHaveCount(0)

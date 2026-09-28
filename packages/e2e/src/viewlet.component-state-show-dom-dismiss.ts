@@ -53,7 +53,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
   await showDom.click()
   await expect(menu2).toBeHidden()
   await expect(selectedTabTitle).toHaveText(`${statusBar.uid}.json`)
-  const dom = JSON.parse(await Editor.getText())
+  const dom = await Editor.getTextAsJson()
   if (!Array.isArray(dom) || dom.every((node) => !node.className?.split(' ').includes('StatusBar'))) {
     throw new Error('Expected StatusBar DOM after reopening the menu on its card')
   }

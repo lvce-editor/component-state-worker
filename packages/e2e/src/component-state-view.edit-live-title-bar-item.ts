@@ -30,7 +30,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { titleBarEntries: originalTitleBarEntries, uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected TitleBar state uid ${component.uid}, got ${uid}`)
@@ -38,7 +38,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   const titleBarEntries = (originalTitleBarEntries as readonly Entry[]).map((entry) =>
     entry.label === 'File' ? { ...entry, label: 'Live menu label' } : entry,
   )
-  await Editor.setText(`${JSON.stringify({ ...state, titleBarEntries }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, titleBarEntries })
   const updatedEntry = Locator('.TitleBarTopLevelEntry', { hasText: 'Live menu label' })
   await expect(updatedEntry).toBeVisible()
   await expect(originalEntry).toHaveCount(0)

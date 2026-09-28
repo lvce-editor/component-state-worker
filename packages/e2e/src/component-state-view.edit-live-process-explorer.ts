@@ -28,12 +28,12 @@ export const test: Test = async ({ Command, ComponentState, Developer, Editor, e
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected ProcessExplorer state uid ${component.uid}, got ${uid}`)
   }
-  await Editor.setText(`${JSON.stringify({ ...state, errorMessage: 'Live State Error' }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, errorMessage: 'Live State Error' })
 
   await Developer.openProcessExplorer()
   const errorMessage = Locator('.ProcessExplorerError')

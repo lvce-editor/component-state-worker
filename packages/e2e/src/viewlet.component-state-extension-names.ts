@@ -45,7 +45,7 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
     await card.click()
     const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
     await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
-    const state = JSON.parse(await Editor.getText())
+    const state = await Editor.getTextAsJson()
     const { viewId } = state
     if (viewId !== `sample.component-state-${title.toLowerCase()}`) {
       throw new Error(`Expected the ${title} view state, got ${JSON.stringify(state)}`)

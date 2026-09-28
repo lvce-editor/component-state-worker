@@ -31,12 +31,12 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected Problems state uid ${component.uid}, got ${uid}`)
   }
-  await Editor.setText(`${JSON.stringify({ ...state, filterValue: 'live state filter', inputSource: 2 }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, filterValue: 'live state filter', inputSource: 2 })
 
   await expect(filter).toHaveValue('live state filter')
 

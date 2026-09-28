@@ -23,9 +23,9 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
     throw new Error('Live component DOM JSON must be editable')
   }
   await Main.openUri(uri)
-  const dom = JSON.parse(await Editor.getText())
+  const dom = await Editor.getTextAsJson()
   const editedDom = [{ ...dom[0], childCount: 0, className: [dom[0].className, 'LiveEditedDom'].join(' ') }]
-  await Editor.setText(`${JSON.stringify(editedDom, null, 2)}\n`)
+  await Editor.setJsonAsText(editedDom)
   const editedExplorer = Locator('.Explorer.LiveEditedDom')
   await expect(editedExplorer).toBeVisible()
   await expect(firstItem).toBeHidden()
@@ -34,7 +34,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
 
   await Editor.setText('[')
   await expect(editedExplorer).toBeVisible()
-  await Editor.setText(`${JSON.stringify(editedDom, null, 2)}\n`)
+  await Editor.setJsonAsText(editedDom)
   await Main.save()
   await expect(editedExplorer).toBeVisible()
 

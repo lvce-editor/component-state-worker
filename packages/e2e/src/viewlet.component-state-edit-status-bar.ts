@@ -37,7 +37,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { statusBarItemsRight: originalItemsRight } = state
   const labels: Readonly<Record<string, string>> = {
     EditorEncoding: 'Live encoding',
@@ -54,7 +54,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
       tooltip: 'Live component state',
     },
   ]
-  await Editor.setText(`${JSON.stringify({ ...state, statusBarItemsLeft, statusBarItemsRight }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, statusBarItemsLeft, statusBarItemsRight })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

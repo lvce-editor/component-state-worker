@@ -30,12 +30,12 @@ export const test: Test = async ({ Command, ComponentState, Developer, Editor, e
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected Ports state uid ${component.uid}, got ${uid}`)
   }
-  await Editor.setText(`${JSON.stringify({ ...state, addPortValue: '5123', editing: true }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, addPortValue: '5123', editing: true })
   const input = Locator('.Ports .AddPortInput')
   await expect(input).toBeVisible()
   await expect(input).toHaveValue('5123')

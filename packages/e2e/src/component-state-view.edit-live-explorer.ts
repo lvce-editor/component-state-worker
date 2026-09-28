@@ -30,8 +30,8 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`).click()
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, focusedIndex: 1 })
 
   const updatedState = await ComponentState.getState<{ readonly focusedIndex: number }>(explorer.uid)
   if (updatedState.focusedIndex !== 1) {

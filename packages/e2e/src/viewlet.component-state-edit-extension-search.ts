@@ -25,8 +25,8 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionSearch, Loc
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, inputSource: 2, searchValue: '@disabled' }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, inputSource: 2, searchValue: '@disabled' })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

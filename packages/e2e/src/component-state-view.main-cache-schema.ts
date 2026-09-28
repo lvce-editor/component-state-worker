@@ -24,7 +24,7 @@ export const test: Test = async ({ Command, ComponentState, Editor, FileSystem, 
   const editorId = (await Command.execute('GetActiveEditor.getActiveEditorId')) as number
   await Editor.shouldHaveDiagnosticProviderResult([], editorId)
 
-  await Editor.setText(JSON.stringify({ $schema: schemaUri, fileIconCache: { 'file:///invalid.json': 123 } }, null, 2))
+  await Editor.setJsonAsText({ $schema: schemaUri, fileIconCache: { 'file:///invalid.json': 123 } })
   await Editor.shouldHaveDiagnosticProviderResult(
     [
       {

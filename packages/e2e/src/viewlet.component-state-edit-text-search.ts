@@ -25,8 +25,8 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main, SideB
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, inputSource: 2, value: 'live state query' }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, inputSource: 2, value: 'live state query' })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

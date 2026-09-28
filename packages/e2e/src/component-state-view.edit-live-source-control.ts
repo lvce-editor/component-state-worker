@@ -45,12 +45,12 @@ export const test: Test = async ({
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { id } = state
   if (id !== component.uid) {
     throw new Error(`Expected Source Control state id ${component.uid}, got ${id}`)
   }
-  await Editor.setText(`${JSON.stringify({ ...state, providerUnavailableMessage: 'Live source control message' }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, providerUnavailableMessage: 'Live source control message' })
 
   await expect(message).toHaveText('Live source control message')
 

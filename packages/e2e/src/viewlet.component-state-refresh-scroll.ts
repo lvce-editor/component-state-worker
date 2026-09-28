@@ -29,7 +29,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
     const state = await Command.execute('ComponentState.getState', explorer.uid)
     await Command.execute('ComponentState.setState', explorer.uid, { ...state, focusedIndex })
     await waitForState(
-      async () => JSON.parse(await Editor.getText()),
+      () => Editor.getTextAsJson(),
       (value) => value.focusedIndex === focusedIndex,
       `live focusedIndex ${focusedIndex}`,
       2000,
