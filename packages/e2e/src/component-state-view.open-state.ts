@@ -26,8 +26,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   const editor = Locator('.Editor')
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
   await expect(editor).toBeVisible()
-  const content = await Editor.getText()
-  const state = JSON.parse(content)
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== explorer.uid) {
     throw new Error(`Expected state uid ${explorer.uid}, got ${uid}`)

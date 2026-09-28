@@ -37,8 +37,8 @@ export const test: Test = async ({ ActivityBar, Command, Editor, expect, Extensi
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, inputSource: 2, inputValue: 'live state commit' }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, inputSource: 2, inputValue: 'live state commit' })
   await expect(sourceControlInput).toHaveValue('live state commit')
   await Main.save()
 

@@ -44,26 +44,26 @@ export const test: Test = async ({ Command, Editor, expect, Explorer, FileSystem
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
   await Explorer.focusIndex(1)
   await waitForState(
-    async () => JSON.parse(await Editor.getText()),
+    () => Editor.getTextAsJson(),
     ({ focusedIndex }) => focusedIndex === 1,
     'Explorer focusedIndex 1',
   )
 
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   await Editor.setDeltaY(120)
   const firstVisibleLine = Locator('.Editor .LineNumber').first()
   await expect(firstVisibleLine).toBeVisible()
   await expect(firstVisibleLine).toHaveText('7')
   await Command.execute('ComponentState.setState', explorer.uid, state)
   await waitForState(
-    async () => JSON.parse(await Editor.getText()),
+    () => Editor.getTextAsJson(),
     ({ focusedIndex }) => focusedIndex === 1,
     'unchanged Explorer focusedIndex',
   )
   await expect(firstVisibleLine).toBeVisible()
   await expect(firstVisibleLine).toHaveText('7')
 
-  await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 0 }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, focusedIndex: 0 })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', explorer.uid)

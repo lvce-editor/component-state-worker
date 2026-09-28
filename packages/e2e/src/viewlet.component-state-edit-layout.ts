@@ -26,8 +26,8 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
   await expect(editorView).toContainText('{')
   const statusBar = Locator('.StatusBar')
   await expect(statusBar).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, sideBarWidth: 320, statusBarVisible: false }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, sideBarWidth: 320, statusBarVisible: false })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

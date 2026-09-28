@@ -38,7 +38,7 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Ext
     await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
     const editorView = Locator('.Editor')
     await expect(editorView).toContainText('childCount')
-    const dom = JSON.parse(await Editor.getText())
+    const dom = await Editor.getTextAsJson()
     if (!Array.isArray(dom) || dom.every((node) => !node.className?.split(' ').includes(moduleId))) {
       throw new Error(`Expected ${moduleId} virtual DOM, got ${JSON.stringify(dom)}`)
     }

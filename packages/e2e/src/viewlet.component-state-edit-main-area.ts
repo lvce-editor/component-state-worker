@@ -25,7 +25,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
   const state = await waitForState(
-    async () => JSON.parse(await Editor.getText()),
+    () => Editor.getTextAsJson(),
     ({ layout }) => {
       const { activeGroupId, groups } = layout
       const activeGroup = groups.find((group: { readonly id: number }) => group.id === activeGroupId)
@@ -35,10 +35,11 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
     'the Main component-state editor to finish loading',
   )
   const dragOverlay = { height: 40, width: 80, x: 10, y: 10 }
-  await Editor.setText(`${JSON.stringify({ ...state, dragOverlay }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, dragOverlay })
   const liveDragOverlay = Locator('.Main .DragOverlay')
   await expect(liveDragOverlay).toBeVisible()
-  if (!JSON.parse(await Editor.getText()).dragOverlay) {
+  const currentState = await Editor.getTextAsJson()
+  if (!currentState.dragOverlay) {
     throw new Error('Live Main state editor was overwritten before save')
   }
   await Main.save()

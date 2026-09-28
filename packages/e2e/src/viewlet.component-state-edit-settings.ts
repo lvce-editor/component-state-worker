@@ -27,13 +27,13 @@ export const test: Test = async ({ Command, Editor, expect, KeyBoard, Locator, M
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { id } = state
   if (id !== component.uid) {
     throw new Error(`Expected Settings state id ${component.uid}, got ${id}`)
   }
 
-  await Editor.setText(`${JSON.stringify({ ...state, searchValue: 'editor' }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, searchValue: 'editor' })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

@@ -22,7 +22,7 @@ export const test: Test = async ({ Command, ComponentState, ContextMenu, Develop
   const savedStateUri = `live-component-state:///saved/${component.uid}.json`
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
-  const editorState = JSON.parse(await Editor.getText())
+  const editorState = await Editor.getTextAsJson()
   const savedState = await Command.execute('ComponentState.getSavedState', component.uid)
   const fileContents = await FileSystem.readFile(savedStateUri)
   if (JSON.stringify(editorState) !== JSON.stringify(savedState) || `${JSON.stringify(editorState, null, 2)}\n` !== fileContents) {

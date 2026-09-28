@@ -33,8 +33,8 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Main }) => 
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, filterValue: 'live state filter', inputSource: 2 }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, filterValue: 'live state filter', inputSource: 2 })
   await Main.save()
 
   const updatedState = await Command.execute('ComponentState.getState', component.uid)

@@ -38,7 +38,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { layout: originalLayout, uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected Main state uid ${component.uid}, got ${uid}`)
@@ -47,7 +47,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
     ...group,
     tabs: group.tabs.map((tab) => (tab.uri === uri ? { ...tab, title: 'Live tab label' } : tab)),
   }))
-  await Editor.setText(`${JSON.stringify({ ...state, layout: { ...originalLayout, groups } }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, layout: { ...originalLayout, groups } })
   const updatedTab = Locator('.Main .TabTitle', { hasText: 'Live tab label' })
   await expect(updatedTab).toBeVisible()
   const originalTab = Locator('.Main .TabTitle', { hasText: 'original.txt' })

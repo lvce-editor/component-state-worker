@@ -29,8 +29,8 @@ export const test: Test = async ({ Command, Editor, expect, ExtensionDetail, Loc
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('{')
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, name: 'Live State Extension' }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, name: 'Live State Extension' })
   await waitForState(
     async () => Command.execute('ComponentState.getState', component.uid),
     (value) => value.name === 'Live State Extension',

@@ -39,7 +39,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, KeyBoard
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editorView = Locator('.Editor')
   await expect(editorView).toContainText('childCount')
-  const dom = JSON.parse(await Editor.getText())
+  const dom = await Editor.getTextAsJson()
   if (!Array.isArray(dom) || dom.every((node) => !node.className?.split(' ').includes('Problems'))) {
     throw new Error('Expected Problems virtual DOM')
   }

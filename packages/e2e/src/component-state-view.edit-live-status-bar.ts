@@ -28,7 +28,7 @@ export const test: Test = async ({ Command, ComponentState, Developer, Editor, e
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected StatusBar state uid ${component.uid}, got ${uid}`)
@@ -41,7 +41,7 @@ export const test: Test = async ({ Command, ComponentState, Developer, Editor, e
       tooltip: 'Live status label',
     },
   ]
-  await Editor.setText(`${JSON.stringify({ ...state, statusBarItemsLeft }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, statusBarItemsLeft })
   const item = Locator('.StatusBarItem[name="component.state.test"]')
   await expect(item).toHaveText('Live status label')
 }
