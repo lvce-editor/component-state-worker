@@ -1,29 +1,23 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 interface Item {
   readonly name: string
 }
 
 export const name = 'component-state-view.edit-live-explorer-label'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Settings, Workspace }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, FileSystem, Locator, Settings, SideBar, Workspace }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/original.txt`, 'content')
-  await Workspace.setPath(tmpDir)
-  await Command.execute('Layout.showSideBar', 'Explorer')
+  await Workspace.setUri(tmpDir)
+  await SideBar.open('Explorer')
   const originalItem = Locator('.Explorer .TreeItem[aria-label="original.txt"]')
   await expect(originalItem).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'Explorer')
   if (!component?.editable) {
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
@@ -32,7 +26,7 @@ export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator,
   await expect(card).toBeVisible()
   await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Explorer')
   await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

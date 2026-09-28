@@ -1,4 +1,4 @@
-const isNotSchema = (entry: any): boolean => {
+const isNotSchema = ([key]: readonly [string, unknown]): boolean => {
   return key !== '$schema'
 }
 

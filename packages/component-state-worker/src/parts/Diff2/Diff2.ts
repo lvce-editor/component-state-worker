@@ -1,5 +1,4 @@
 import * as ComponentStateViewStates from '../ComponentStateViewStates/ComponentStateViewStates.ts'
-import { getColumnCount } from '../GetColumnCount/GetColumnCount.ts'
 
 export const diff2 = (uid: number): readonly number[] => {
   const { oldState, scheduledState } = ComponentStateViewStates.get(uid)
@@ -7,7 +6,7 @@ export const diff2 = (uid: number): readonly number[] => {
   if (
     oldState.components !== scheduledState.components ||
     oldState.loaded !== scheduledState.loaded ||
-    getColumnCount(oldState.width) !== getColumnCount(scheduledState.width)
+    oldState.columnCount !== scheduledState.columnCount
   ) {
     diff.push(1)
   }

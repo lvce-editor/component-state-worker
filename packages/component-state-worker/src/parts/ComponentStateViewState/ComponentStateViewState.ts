@@ -1,6 +1,7 @@
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 
 export interface ComponentStateViewState {
+  readonly columnCount: number
   readonly components: readonly ComponentInfo[]
   readonly dragUri: string
   readonly height: number

@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import * as CreateStateSchema from '../src/parts/CreateStateSchema/CreateStateSchema.ts'
 
-test.each([{}, { 'live-component-state:///10.json': '/file-icons/json.svg' }])(
+test.each([{}, { 'live-component-state:///10.json': '/file-icons/json.svg' }] as const)(
   'describes fileIconCache as a string dictionary: %j',
   (fileIconCache) => {
     const schema = CreateStateSchema.createStateSchema({ fileIconCache }, 'live-component-state:///schemas/2.json')

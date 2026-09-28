@@ -23,7 +23,7 @@ test.each([
   { value: ['hello'] },
   { value: [null, true, 1, 'hello'] },
   { value: [{ nested: { value: 1 } }] },
-])('describes array $value without constraining its items', ({ value }) => {
+] as const)('describes array $value without constraining its items', ({ value }) => {
   expect(CreateValueSchema.createValueSchema(value)).toEqual({ type: 'array' })
 })
 
@@ -32,7 +32,7 @@ test.each([
   { label: 'bigint', value: 1n },
   { label: 'symbol', value: Symbol('value') },
   { label: 'function', value: (): number => 1 },
-])('leaves $label unconstrained', ({ value }) => {
+] as const)('leaves $label unconstrained', ({ value }) => {
   expect(CreateValueSchema.createValueSchema(value)).toEqual({})
 })
 
@@ -96,7 +96,7 @@ test('keeps unsupported object property values unconstrained', () => {
   })
 })
 
-test.each([{}, { 'live-component-state:///10.json': '/file-icons/json.svg' }, { first: '/first.svg', second: '/second.svg' }])(
+test.each([{}, { 'live-component-state:///10.json': '/file-icons/json.svg' }, { first: '/first.svg', second: '/second.svg' }] as const)(
   'describes fileIconCache %j as a string dictionary without fixing its keys',
   (value) => {
     expect(CreateValueSchema.createValueSchema(value, 'fileIconCache')).toEqual({
@@ -137,7 +137,7 @@ test.each([
   { type: 'string', value: '/file.svg' },
   { type: 'number', value: 1 },
   { type: 'boolean', value: false },
-])('preserves $type values named fileIconCache', ({ type, value }) => {
+] as const)('preserves $type values named fileIconCache', ({ type, value }) => {
   expect(CreateValueSchema.createValueSchema(value, 'fileIconCache')).toEqual({ type })
 })
 

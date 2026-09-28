@@ -1,26 +1,20 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-problems-toolbar'
 
 // The current renderer does not consistently refresh panel toolbar actions after a live state edit.
 // Reproduced on macOS and Linux ARM in PR #39; requires a renderer/Problems integration fix.
 export const skip = 1
 
-export const test: Test = async ({ Command, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Panel, Settings }) => {
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Command.execute('Layout.showPanel', 'Problems')
+  await Panel.open('Problems')
   const filter = Locator('.Panel .InputBox')
   await expect(filter).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'Problems')
   if (!component?.editable) {
     throw new Error(`Expected an editable Problems component, got ${JSON.stringify(components)}`)
@@ -29,7 +23,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   await expect(card).toBeVisible()
   await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Problems')
   await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
@@ -44,7 +38,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
 
   await expect(filter).toHaveValue('live state filter')
 
-  const updatedState = await Command.execute('ComponentState.getState', component.uid)
+  const updatedState = await ComponentState.getState<{ readonly filterValue: string }>(component.uid)
   if (updatedState.filterValue !== 'live state filter') {
     throw new Error(`Expected Problems filter to update, got ${updatedState.filterValue}`)
   }

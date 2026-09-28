@@ -1,15 +1,9 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.main-cache-schema'
 
-export const test: Test = async ({ Command, Editor, FileSystem, Main, Workspace }) => {
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+export const test: Test = async ({ Command, ComponentState, Editor, FileSystem, Main, Workspace }) => {
+  const components = await ComponentState.getComponents()
   const main = components.find((component) => component.moduleId === 'Main' && component.editable)
   if (!main) {
     throw new Error(`Expected an editable Main component, got ${JSON.stringify(components)}`)
@@ -25,7 +19,7 @@ export const test: Test = async ({ Command, Editor, FileSystem, Main, Workspace 
   const uri = `${tmpDir}/main-cache.json`
   const fileIconCache = Object.fromEntries(Array.from({ length: 100 }, (_, index) => [`file:///new-${index}.json`, '/file-icons/json.svg']))
   await FileSystem.writeFile(uri, JSON.stringify({ $schema: schemaUri, fileIconCache }, null, 2))
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Main.openUri(uri)
   const editorId = (await Command.execute('GetActiveEditor.getActiveEditorId')) as number
   await Editor.shouldHaveDiagnosticProviderResult([], editorId)

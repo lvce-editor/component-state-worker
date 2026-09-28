@@ -1,21 +1,17 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.edit-live-status-bar'
 
-export const test: Test = async ({ Command, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ Command, ComponentState, Developer, Editor, expect, Locator, Settings }) => {
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
+  await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const statusBar = Locator('.StatusBar')
   await expect(statusBar).toBeVisible()
-  await Command.execute('Developer.openComponentState')
+  await Developer.openComponentState()
   const componentView = Locator('.ComponentStateView')
   await expect(componentView).toBeVisible()
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'StatusBar')
   if (!component?.editable) {
     throw new Error(`Expected an editable StatusBar component, got ${JSON.stringify(components)}`)
@@ -24,7 +20,7 @@ export const test: Test = async ({ Command, Editor, expect, Locator, Settings })
   await expect(card).toBeVisible()
   await expect(card.locator('.ComponentStateCardTitle')).toHaveText('StatusBar')
   await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)

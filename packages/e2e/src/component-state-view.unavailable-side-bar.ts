@@ -1,20 +1,14 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
-interface ComponentInfo {
-  readonly editable: boolean
-  readonly moduleId: string
-  readonly uid: number
-}
-
 export const name = 'component-state-view.unavailable-side-bar'
 
-export const test: Test = async ({ Command, expect, Locator, Settings }) => {
+export const test: Test = async ({ ComponentState, Developer, expect, Locator, Settings, SideBar }) => {
   await Settings.update({ 'componentStateView.showUnavailableComponents': true, 'editor.fontFamily': 'monospace' })
-  await Command.execute('Layout.showSideBar', 'Explorer')
+  await SideBar.open('Explorer')
   const view = Locator('.SideBar')
   await expect(view).toBeVisible()
-  await Command.execute('Developer.openComponentState')
-  const components = (await Command.execute('ComponentState.getComponents')) as readonly ComponentInfo[]
+  await Developer.openComponentState()
+  const components = await ComponentState.getComponents()
   const component = components.find((item) => item.moduleId === 'SideBar')
   if (!component || component.editable) {
     throw new Error(`Expected SideBar without a state API; add a live-edit test when supported: ${JSON.stringify(components)}`)

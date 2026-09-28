@@ -1,4 +1,5 @@
 import type { ComponentStateViewState } from '../ComponentStateViewState/ComponentStateViewState.ts'
+import { getColumnCount } from '../GetColumnCount/GetColumnCount.ts'
 
 interface Dimensions {
   readonly height: number
@@ -10,4 +11,5 @@ interface Dimensions {
 export const resize = (state: ComponentStateViewState, dimensions: Dimensions): ComponentStateViewState => ({
   ...state,
   ...dimensions,
+  columnCount: getColumnCount(dimensions.width),
 })

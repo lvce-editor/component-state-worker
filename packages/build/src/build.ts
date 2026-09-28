@@ -1,5 +1,6 @@
+import { build } from 'esbuild'
 import { execa } from 'execa'
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { bundleJs } from './bundleJs.ts'
 import { root } from './root.ts'
@@ -31,3 +32,26 @@ await writeFile(join(dist, 'package.json'), JSON.stringify(packageJson, null, 2)
 await cp(join(root, 'README.md'), join(dist, 'README.md'))
 await cp(join(root, 'LICENSE'), join(dist, 'LICENSE'))
 await cp(join(root, 'packages', 'component-state-worker', 'settings.json'), join(dist, 'dist', 'settings.json'))
+
+const staticRoot = join(root, 'node_modules/@lvce-editor/static-server/static')
+const staticEntries = await readdir(staticRoot, { withFileTypes: true })
+const commitDirectory = staticEntries.find((entry) => entry.isDirectory() && /^[a-f0-9]{7}$/.test(entry.name))
+if (!commitDirectory) throw new Error('Server static assets are missing')
+await cp(
+  join(staticRoot, commitDirectory.name, 'js/lvce-editor-rpc.js'),
+  join(root, 'packages/e2e/fixtures/sample.component-state-extension-names/rpc.js'),
+)
+
+const fixtureRoot = join(root, 'packages/e2e/fixtures')
+await Promise.all(
+  ['sample.component-state-extension-names', 'sample.source-control-save-badge'].map((fixture) =>
+    build({
+      bundle: true,
+      entryPoints: [join(fixtureRoot, fixture, 'main.js')],
+      external: ['electron', 'node:*'],
+      format: 'esm',
+      outfile: join(fixtureRoot, fixture, 'main.bundle.js'),
+      platform: 'browser',
+    }),
+  ),
+)
