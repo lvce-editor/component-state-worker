@@ -1,6 +1,7 @@
 import { text, type VirtualDomNode, VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import type { ComponentInfo } from '../ComponentInfo/ComponentInfo.ts'
 import * as ClassNames from '../ClassNames/ClassNames.ts'
+import * as ComponentStateStrings from '../ComponentStateStrings/ComponentStateStrings.ts'
 import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEventListenerFunctions.ts'
 
 const titleNode: VirtualDomNode = {
@@ -22,13 +23,22 @@ const statusNode: VirtualDomNode = {
 }
 
 export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => {
-  const status = component.editable ? 'Open JSON state' : 'State API unavailable'
+  let status = ComponentStateStrings.stateApiUnavailable()
+  if (component.editable) {
+    status = ComponentStateStrings.openJsonState()
+  } else if (component.savedStateAvailable) {
+    status = ComponentStateStrings.savedStateAvailable()
+  }
+  const uid =
+    typeof component.stateSize === 'number'
+      ? ComponentStateStrings.uidWithSize(component.uid, component.stateSize)
+      : ComponentStateStrings.uid(component.uid)
   return [
     {
       childCount: 3,
       className: ClassNames.Card,
       'data-uid': String(component.uid),
-      disabled: !component.editable,
+      disabled: !component.editable && !component.savedStateAvailable,
       draggable: component.editable,
       onClick: DomEventListenerFunctions.HandleClick,
       onContextMenu: DomEventListenerFunctions.HandleContextMenu,
@@ -39,7 +49,7 @@ export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => 
     titleNode,
     text(component.displayName || component.moduleId),
     uidNode,
-    text(`uid ${component.uid}`),
+    text(uid),
     statusNode,
     text(status),
   ]

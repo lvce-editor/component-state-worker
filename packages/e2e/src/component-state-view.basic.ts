@@ -5,7 +5,7 @@ export const name = 'component-state-view.basic'
 export const test: Test = async ({ Developer, expect, FileSystem, Locator, SideBar, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()

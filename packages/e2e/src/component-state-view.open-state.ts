@@ -7,7 +7,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
   // Keep this component-state test independent of browser-specific font loading behavior.
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
@@ -19,7 +19,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
     throw new Error(`Expected an editable Explorer component, got ${JSON.stringify(components)}`)
   }
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
-  // eslint-disable-next-line e2e/no-direct-click -- verifies that a rendered component card opens its live JSON state
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies that a rendered component card opens its live JSON state
   await explorerCard.click()
 
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')

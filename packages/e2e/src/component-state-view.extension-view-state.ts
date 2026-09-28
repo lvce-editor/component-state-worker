@@ -30,7 +30,7 @@ export const test: Test = async ({ ActivityBar, ComponentState, Developer, Edito
   const cardStatus = extensionViewCard.locator('.ComponentStateCardStatus')
   await expect(cardStatus).toHaveText('Open JSON state')
 
-  // eslint-disable-next-line e2e/no-direct-click -- verifies that the extension component card opens its live JSON editor
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies that the extension component card opens its live JSON editor
   await extensionViewCard.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${extensionView.uid}.json`)

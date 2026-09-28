@@ -5,17 +5,24 @@
       "project": ["*.js"]
     },
     "packages/build": {
-      "entry": ["src/build-static.ts", "src/build.ts", "src/computeNodeModulesCacheKey.ts", "src/dev.ts", "src/startServer.ts"],
+      "entry": [
+        "src/build-static.ts",
+        "src/build.ts",
+        "src/computeNodeModulesCacheKey.ts",
+        "src/dev.ts",
+        "src/startServer.ts",
+        "src/startServerSavedState.ts"
+      ],
       "project": ["src/**/*.ts"],
-      "ignoreDependencies": ["esbuild"]
+      "ignoreDependencies": ["@lvce-editor/explorer-view", "@lvce-editor/source-control-worker", "@lvce-editor/status-bar-worker"]
     },
     "packages/component-state-worker": {
       "entry": ["test/**/*.test.ts"],
       "project": ["src/**/*.ts", "test/**/*.ts"]
     },
     "packages/e2e": {
-      "entry": ["src/**/*.ts"],
-      "project": ["src/**/*.ts"]
+      "entry": ["src/**/*.ts", "saved-state/src/**/*.ts"],
+      "project": ["src/**/*.ts", "saved-state/src/**/*.ts"]
     }
   }
 }

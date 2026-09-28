@@ -26,6 +26,7 @@
     "format": "prettier --write .",
     "lint": "eslint . && prettier --check . && knip --no-config-hints",
     "test": "npm test --workspaces --if-present",
+    "test:component-heap-snapshot": "node scripts/test-component-heap-snapshot.mjs",
     "type-check": "tsc -b"
   },
   "prettier": {

@@ -19,7 +19,7 @@ export const test: Test = async ({ Command, ComponentState, Editor, FileSystem, 
   const uri = `${tmpDir}/main-cache.json`
   const fileIconCache = Object.fromEntries(Array.from({ length: 100 }, (_, index) => [`file:///new-${index}.json`, '/file-icons/json.svg']))
   await FileSystem.writeFile(uri, JSON.stringify({ $schema: schemaUri, fileIconCache }, null, 2))
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await Main.openUri(uri)
   const editorId = (await Command.execute('GetActiveEditor.getActiveEditorId')) as number
   await Editor.shouldHaveDiagnosticProviderResult([], editorId)
