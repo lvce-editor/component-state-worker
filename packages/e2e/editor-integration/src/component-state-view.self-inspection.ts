@@ -2,11 +2,9 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.self-inspection'
 
-// Enable once the editor fixture includes the ComponentState live-state adapter.
-export const skip = 1
-
-export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ Command, ComponentState, Developer, Editor, expect, Locator, Settings }) => {
   await Settings.update({ 'componentStateView.showStateSize': true, 'editor.fontFamily': 'monospace' })
+  await Developer.openComponentState()
   await Developer.openComponentState()
   const view = Locator('.ComponentStateView')
   await expect(view).toBeVisible()
@@ -40,4 +38,20 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   if (updatedState.columnCount !== columnCount + 1) {
     throw new Error(`Expected ComponentState columnCount to update from JSON, got ${JSON.stringify(updatedState)}`)
   }
+
+  const refreshButton = Locator('.ComponentStateHeader .IconButton[title="Refresh"]')
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies manual refresh while inspecting ComponentState
+  await refreshButton.click()
+  await expect(card).toBeVisible()
+
+  await Command.execute('Layout.openSecondarySideBarViewlet', 'Explorer')
+  await expect(view).toHaveCount(0)
+  await Developer.openComponentState()
+  const reopenedComponents = await ComponentState.getComponents()
+  const reopenedComponent = reopenedComponents.find((item) => item.moduleId === 'ComponentState')
+  if (!reopenedComponent?.editable) {
+    throw new Error(`Expected ComponentState to remain editable after disposal and reopen, got ${JSON.stringify(reopenedComponent)}`)
+  }
+  const reopenedCard = Locator(`.ComponentStateCard[data-uid="${reopenedComponent.uid}"]`)
+  await expect(reopenedCard).toBeVisible()
 }
