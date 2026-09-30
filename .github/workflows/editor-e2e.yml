@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: lvce-editor/lvce-editor
-          ref: c78d76777bdcd88416826cb25c41bd682ad4e175
+          ref: b4681bb160134ea9de88feae9b4d01292c2bd505
           path: .tmp/lvce-editor
       - name: Install editor fixture
         working-directory: .tmp/lvce-editor
@@ -32,5 +32,21 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Install worker under test
         run: cp .tmp/dist/dist/componentStateWorkerMain.js .tmp/lvce-editor/packages/renderer-worker/node_modules/@lvce-editor/component-state-worker/dist/componentStateWorkerMain.js
+      - name: Build editor integration fixture
+        working-directory: .tmp/lvce-editor
+        run: |
+          npm run build:static
+          npm run build:server
+          ln -s ../build/.tmp/server/static-server/static packages/static-server/static
+      - name: Install Chromium for self-inspection e2e
+        working-directory: packages/e2e
+        run: npx playwright install --with-deps chromium
+      - name: Test component state self-inspection
+        working-directory: packages/e2e
+        run: >-
+          xvfb-run -a npx test-with-playwright --headless --test-path=editor-integration
+          --filter=component-state-view.self-inspection
+          --server-path=../../.tmp/lvce-editor/packages/build/.tmp/server/server/bin/server.js
+          --link=../../.tmp/lvce-editor/packages/build/.tmp/dist
       - name: Test component-heap-snapshot
         run: xvfb-run -a npm run test:component-heap-snapshot
