@@ -4,6 +4,7 @@ import * as Diff2 from '../Diff2/Diff2.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'
 import * as GetMenuEntries from '../GetMenuEntries/GetMenuEntries.ts'
 import * as GetMenuEntryIds from '../GetMenuEntryIds/GetMenuEntryIds.ts'
+import * as GetViewState from '../GetViewState/GetViewState.ts'
 import * as HandleClick from '../HandleClick/HandleClick.ts'
 import * as HandleContextMenu from '../HandleContextMenu/HandleContextMenu.ts'
 import * as HandleEditorChanged from '../HandleEditorChanged/HandleEditorChanged.ts'
@@ -13,6 +14,7 @@ import * as Refresh from '../Refresh/Refresh.ts'
 import * as Render2 from '../Render2/Render2.ts'
 import * as RenderEventListeners from '../RenderEventListeners/RenderEventListeners.ts'
 import * as Resize from '../Resize/Resize.ts'
+import * as SetViewState from '../SetViewState/SetViewState.ts'
 import * as ShowDom from '../ShowDom/ShowDom.ts'
 import * as ShowHeapSnapshot from '../ShowHeapSnapshot/ShowHeapSnapshot.ts'
 import * as ShowSavedState from '../ShowSavedState/ShowSavedState.ts'
@@ -35,6 +37,7 @@ export const commandMap = {
   'ComponentState.getCommandIds': ComponentStateViewStates.getCommandIds,
   'ComponentState.getMenuEntries': GetMenuEntries.getMenuEntries,
   'ComponentState.getMenuEntryIds': GetMenuEntryIds.getMenuEntryIds,
+  'ComponentState.getViewState': GetViewState.getViewState,
   ...viewCommandMap,
   'ComponentState.isReadonly': FileSystem.isReadonly,
   'ComponentState.loadContent': ComponentStateViewStates.wrapCommand(LoadContent.loadContent),
@@ -43,6 +46,7 @@ export const commandMap = {
   'ComponentState.render2': Render2.render2,
   'ComponentState.renderEventListeners': RenderEventListeners.renderEventListeners,
   'ComponentState.resize': ComponentStateViewStates.wrapCommand(Resize.resize),
+  'ComponentState.setViewState': SetViewState.setViewState,
   'ComponentState.writeFile': FileSystem.writeFile,
   handleEditorChanged: HandleEditorChanged.handleEditorChanged,
 }
