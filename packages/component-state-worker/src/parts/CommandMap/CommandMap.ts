@@ -8,6 +8,7 @@ import * as GetViewState from '../GetViewState/GetViewState.ts'
 import * as HandleClick from '../HandleClick/HandleClick.ts'
 import * as HandleContextMenu from '../HandleContextMenu/HandleContextMenu.ts'
 import * as HandleEditorChanged from '../HandleEditorChanged/HandleEditorChanged.ts'
+import * as HandleMessagePort from '../HandleMessagePort/HandleMessagePort.ts'
 import * as HandlePointerDown from '../HandlePointerDown/HandlePointerDown.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as Refresh from '../Refresh/Refresh.ts'
@@ -38,6 +39,7 @@ export const commandMap = {
   'ComponentState.getMenuEntries': GetMenuEntries.getMenuEntries,
   'ComponentState.getMenuEntryIds': GetMenuEntryIds.getMenuEntryIds,
   'ComponentState.getViewState': GetViewState.getViewState,
+  'ComponentState.handleMessagePort': HandleMessagePort.handleMessagePort,
   ...viewCommandMap,
   'ComponentState.isReadonly': FileSystem.isReadonly,
   'ComponentState.loadContent': ComponentStateViewStates.wrapCommand(LoadContent.loadContent),

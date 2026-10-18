@@ -1,4 +1,12 @@
 import * as ViewletRegistry from '@lvce-editor/viewlet-registry'
 import type { ComponentStateViewState } from '../ComponentStateViewState/ComponentStateViewState.ts'
 
-export const { dispose, get, getCommandIds, registerCommands, set, wrapCommand } = ViewletRegistry.create<ComponentStateViewState>()
+export const {
+  createDirectEventCommandMap,
+  dispose,
+  get,
+  getCommandIds,
+  registerCommands,
+  set,
+  wrapSerialCommand: wrapCommand,
+} = ViewletRegistry.create<ComponentStateViewState>()
