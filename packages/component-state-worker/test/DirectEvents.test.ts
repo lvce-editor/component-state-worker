@@ -111,3 +111,13 @@ test('retries from the previous baseline after a queue failure without reviving 
   await expect(queueRender(1, [['Viewlet.setDom2', 1, []]], baseline, newer)).rejects.toThrow('disposed')
   expect(States.get(1)).toBeUndefined()
 })
+
+test('secondary ports preserve the renderer-process connection used for patch commits', async () => {
+  const secondaryInvoke = jest.fn<(...args: readonly any[]) => Promise<any>>().mockResolvedValue(99)
+  createRpc.mockResolvedValueOnce({ invoke: secondaryInvoke })
+  await handleMessagePort({} as MessagePort, false)
+  const { newState, oldState } = States.get(1)
+  await queueRender(1, [['Viewlet.setDom2', 1, []]], oldState, newState)
+  expect(processInvoke).toHaveBeenCalledWith('Viewlet.queueCommands', 1, expect.any(Array))
+  expect(secondaryInvoke).not.toHaveBeenCalled()
+})
