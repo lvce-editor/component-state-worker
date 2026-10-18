@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: lvce-editor/lvce-editor
-          ref: b4681bb160134ea9de88feae9b4d01292c2bd505
+          ref: 0f3847a1d58d8a43fcc4bb4b196c61fe97a77230
           path: .tmp/lvce-editor
       - name: Install editor fixture
         working-directory: .tmp/lvce-editor
