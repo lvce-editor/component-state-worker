@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../.tmp/lvce-editor')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), process.env.LVCE_FIXTURE_PATH || '../.tmp/lvce-editor')
 const requireTests = createRequire(join(root, 'packages/extension-host-worker-tests/package.json'))
 const requireMain = createRequire(join(root, 'packages/main-process/package.json'))
 const requireBuild = createRequire(join(root, 'packages/build/package.json'))
@@ -74,6 +74,22 @@ try {
   const snapshot = JSON.parse(await readFile(join(downloads, files[0]), 'utf8'))
   assert.ok(snapshot.snapshot.node_count > 0)
   assert.ok(snapshot.nodes.length > 0)
+
+  await page.keyboard.press('Control+w')
+  await expect(page.locator('.HeapSnapshotView')).toHaveCount(0)
+  await card.click({ button: 'right' })
+  await expect(action).toBeEnabled()
+  await action.click()
+  await expect(page.locator('.HeapSnapshotView')).toBeVisible({ timeout: 60000 })
+  await expect(page.locator('.HeapSnapshotViewError')).toHaveCount(0)
+  await expect(page.locator('.HeapSnapshotTable')).toBeVisible()
+  const reopenedFiles = (await readdir(downloads)).filter((name) => name.endsWith('.heapsnapshot'))
+  assert.equal(reopenedFiles.length, 2)
+  const reopenedSnapshot = JSON.parse(await readFile(join(downloads, reopenedFiles[1]), 'utf8'))
+  assert.ok(reopenedSnapshot.snapshot.node_count > 0)
+  assert.ok(reopenedSnapshot.nodes.length > 0)
+  await page.keyboard.press('Control+w')
+  await expect(page.locator('.HeapSnapshotView')).toHaveCount(0)
   console.log(`Component heap snapshot passed: ${join(downloads, files[0])}`)
 } finally {
   try {

@@ -48,5 +48,27 @@ jobs:
           --filter=component-state-view.self-inspection
           --server-path=../../.tmp/lvce-editor/packages/build/.tmp/server/server/bin/server.js
           --link=../../.tmp/lvce-editor/packages/build/.tmp/dist
+      - name: Check out current editor fixture
+        uses: actions/checkout@v7
+        with:
+          repository: lvce-editor/lvce-editor
+          ref: 0f3847a1d58d8a43fcc4bb4b196c61fe97a77230
+          path: .tmp/lvce-editor-current
+      - name: Install current editor fixture
+        working-directory: .tmp/lvce-editor-current
+        run: npm ci
+      - name: Install current editor browser dependencies
+        working-directory: .tmp/lvce-editor-current/packages/extension-host-worker-tests
+        run: npx playwright install --with-deps chromium
+      - name: Install worker under test in current editor fixture
+        run: cp .tmp/dist/dist/componentStateWorkerMain.js .tmp/lvce-editor-current/packages/renderer-worker/node_modules/@lvce-editor/component-state-worker/dist/componentStateWorkerMain.js
+      - name: Build current editor integration fixture
+        working-directory: .tmp/lvce-editor-current
+        run: |
+          npm run build:static
+          npm run build:server
+          ln -s ../build/.tmp/server/static-server/static packages/static-server/static
       - name: Test component-heap-snapshot
+        env:
+          LVCE_FIXTURE_PATH: ../.tmp/lvce-editor-current
         run: xvfb-run -a npm run test:component-heap-snapshot
