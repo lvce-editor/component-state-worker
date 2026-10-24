@@ -13,3 +13,16 @@ test('contributes the unavailable components setting with a false default', asyn
     }),
   )
 })
+
+test('contributes the component state size setting with a false default', async () => {
+  const settingsUrl = new URL('../settings.json', import.meta.url)
+  const settings = JSON.parse(await readFile(settingsUrl, 'utf8'))
+
+  expect(settings).toContainEqual(
+    expect.objectContaining({
+      id: 'componentStateView.showStateSize',
+      type: 'boolean',
+      value: false,
+    }),
+  )
+})

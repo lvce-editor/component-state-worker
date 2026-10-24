@@ -20,20 +20,22 @@ export const test: Test = async ({ Command, ComponentState, Developer, Editor, e
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
-  await expect(card.locator('.ComponentStateCardTitle')).toHaveText('SimpleBrowser')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  const cardTitle = card.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('SimpleBrowser')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected SimpleBrowser state uid ${component.uid}, got ${uid}`)
   }
-  await Editor.setText(`${JSON.stringify({ ...state, inputValue: 'Live browser state' }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, inputValue: 'Live browser state' })
 
   const addressInput = Locator('.SimpleBrowserHeader input.InputBox')
   await expect(addressInput).toHaveValue('Live browser state')

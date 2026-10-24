@@ -21,7 +21,7 @@ export const test: Test = async ({
   ])
   // Keep this component-state test independent of browser-specific font loading behavior.
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
 
   const firstExplorerItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
@@ -48,11 +48,11 @@ export const test: Test = async ({
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
   await expect(editor).toBeVisible()
 
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   if (JSON.stringify(state) !== JSON.stringify(fileState)) {
     throw new Error('Expected the editor content to match the live file-system provider content')
   }
-  await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, focusedIndex: 1 })
   await Main.save()
 
   const updatedState = await ComponentState.getState<{ readonly focusedIndex: number }>(explorer.uid)

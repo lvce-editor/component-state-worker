@@ -9,7 +9,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
   await Settings.update({ 'editor.fontFamily': 'monospace' })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
 
   const firstExplorerItem = Locator('.Explorer .TreeItem[aria-label="a.txt"]')
@@ -26,12 +26,12 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
 
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   const editor = Locator('.Editor')
-  // eslint-disable-next-line e2e/no-direct-click -- verifies that opening a component state subscribes its editor to live updates
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies that opening a component state subscribes its editor to live updates
   await Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`).click()
   await expect(selectedTabTitle).toHaveText(`${explorer.uid}.json`)
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
-  await Editor.setText(`${JSON.stringify({ ...state, focusedIndex: 1 }, null, 2)}\n`)
+  const state = await Editor.getTextAsJson()
+  await Editor.setJsonAsText({ ...state, focusedIndex: 1 })
 
   const updatedState = await ComponentState.getState<{ readonly focusedIndex: number }>(explorer.uid)
   if (updatedState.focusedIndex !== 1) {

@@ -21,8 +21,16 @@ export const stateApiUnavailable = (): string => {
   return i18nString(UiStrings.StateApiUnavailable)
 }
 
+export const savedStateAvailable = (): string => {
+  return i18nString(UiStrings.SavedStateAvailable)
+}
+
 export const uid = (value: number): string => {
   return i18nString(UiStrings.Uid, { PH1: value })
+}
+
+export const uidWithSize = (uid: number, size: number): string => {
+  return i18nString(UiStrings.UidWithSize, { PH1: uid, PH2: size })
 }
 
 export const liveComponents = (value: number): string => {
@@ -35,6 +43,10 @@ export const loadingLiveComponents = (): string => {
 
 export const showDom = (): string => {
   return i18nString(UiStrings.ShowDom)
+}
+
+export const showSavedState = (): string => {
+  return i18nString(UiStrings.ShowSavedState)
 }
 
 export const copyStateAsJson = (): string => {

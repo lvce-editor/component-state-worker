@@ -1,0 +1,74 @@
+name: Editor integration
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  editor-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+      - run: npm ci
+      - run: npm run build
+      - name: Check out editor fixture
+        uses: actions/checkout@v7
+        with:
+          repository: lvce-editor/lvce-editor
+          ref: b4681bb160134ea9de88feae9b4d01292c2bd505
+          path: .tmp/lvce-editor
+      - name: Install editor fixture
+        working-directory: .tmp/lvce-editor
+        run: npm ci
+      - name: Install browser dependencies
+        working-directory: .tmp/lvce-editor/packages/extension-host-worker-tests
+        run: npx playwright install --with-deps chromium
+      - name: Install worker under test
+        run: cp .tmp/dist/dist/componentStateWorkerMain.js .tmp/lvce-editor/packages/renderer-worker/node_modules/@lvce-editor/component-state-worker/dist/componentStateWorkerMain.js
+      - name: Build editor integration fixture
+        working-directory: .tmp/lvce-editor
+        run: |
+          npm run build:static
+          npm run build:server
+          ln -s ../build/.tmp/server/static-server/static packages/static-server/static
+      - name: Install Chromium for self-inspection e2e
+        working-directory: packages/e2e
+        run: npx playwright install --with-deps chromium
+      - name: Test component state self-inspection
+        working-directory: packages/e2e
+        run: >-
+          xvfb-run -a npx test-with-playwright --headless --test-path=editor-integration
+          --filter=component-state-view.self-inspection
+          --server-path=../../.tmp/lvce-editor/packages/build/.tmp/server/server/bin/server.js
+          --link=../../.tmp/lvce-editor/packages/build/.tmp/dist
+      - name: Check out current editor fixture
+        uses: actions/checkout@v7
+        with:
+          repository: lvce-editor/lvce-editor
+          ref: 0f3847a1d58d8a43fcc4bb4b196c61fe97a77230
+          path: .tmp/lvce-editor-current
+      - name: Install current editor fixture
+        working-directory: .tmp/lvce-editor-current
+        run: npm ci
+      - name: Install current editor browser dependencies
+        working-directory: .tmp/lvce-editor-current/packages/extension-host-worker-tests
+        run: npx playwright install --with-deps chromium
+      - name: Install worker under test in current editor fixture
+        run: cp .tmp/dist/dist/componentStateWorkerMain.js .tmp/lvce-editor-current/packages/renderer-worker/node_modules/@lvce-editor/component-state-worker/dist/componentStateWorkerMain.js
+      - name: Build current editor integration fixture
+        working-directory: .tmp/lvce-editor-current
+        run: |
+          npm run build:static
+          npm run build:server
+          ln -s ../build/.tmp/server/static-server/static packages/static-server/static
+      - name: Test component-heap-snapshot
+        env:
+          LVCE_FIXTURE_PATH: ../.tmp/lvce-editor-current
+        run: xvfb-run -a npm run test:component-heap-snapshot

@@ -23,13 +23,22 @@ const statusNode: VirtualDomNode = {
 }
 
 export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => {
-  const status = component.editable ? ComponentStateStrings.openJsonState() : ComponentStateStrings.stateApiUnavailable()
+  let status = ComponentStateStrings.stateApiUnavailable()
+  if (component.editable) {
+    status = ComponentStateStrings.openJsonState()
+  } else if (component.savedStateAvailable) {
+    status = ComponentStateStrings.savedStateAvailable()
+  }
+  const uid =
+    typeof component.stateSize === 'number'
+      ? ComponentStateStrings.uidWithSize(component.uid, component.stateSize)
+      : ComponentStateStrings.uid(component.uid)
   return [
     {
       childCount: 3,
       className: ClassNames.Card,
       'data-uid': String(component.uid),
-      disabled: !component.editable,
+      disabled: !component.editable && !component.savedStateAvailable,
       draggable: component.editable,
       onClick: DomEventListenerFunctions.HandleClick,
       onContextMenu: DomEventListenerFunctions.HandleContextMenu,
@@ -40,7 +49,7 @@ export const getCard = (component: ComponentInfo): readonly VirtualDomNode[] => 
     titleNode,
     text(component.displayName || component.moduleId),
     uidNode,
-    text(ComponentStateStrings.uid(component.uid)),
+    text(uid),
     statusNode,
     text(status),
   ]

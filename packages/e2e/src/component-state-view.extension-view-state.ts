@@ -27,19 +27,20 @@ export const test: Test = async ({ ActivityBar, ComponentState, Developer, Edito
   await Developer.openComponentState()
   const extensionViewCard = Locator(`.ComponentStateCard[data-uid="${extensionView.uid}"]`)
   await expect(extensionViewCard).toBeVisible()
-  await expect(extensionViewCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
+  const cardStatus = extensionViewCard.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
 
-  // eslint-disable-next-line e2e/no-direct-click -- verifies that the extension component card opens its live JSON editor
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- verifies that the extension component card opens its live JSON editor
   await extensionViewCard.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${extensionView.uid}.json`)
-  const state = JSON.parse(await Editor.getText()) as ExtensionViewState
+  const state = await Editor.getTextAsJson<ExtensionViewState>()
   const { count: initialCount } = state
   if (initialCount !== 1) {
     throw new Error(`Expected extension view count to be 1, got ${initialCount}`)
   }
 
-  await Editor.setText(`${JSON.stringify({ ...state, count: 2 }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, count: 2 })
 
   const updatedCount = Locator('text=Extension count: 2')
   await expect(updatedCount).toBeVisible()

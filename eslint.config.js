@@ -8,7 +8,13 @@ export default defineConfig([
   ...config.recommendedRegex,
   ...config.recommendedTsconfig,
   ...config.recommendedActions,
-  ...config.recommendedNvmrc,
+  ...config.recommendedNvmrc.map((nvmrcConfig) => ({
+    ...nvmrcConfig,
+    rules: {
+      ...nvmrcConfig.rules,
+      'nvmrc/valid-version': ['error', { maximumVersion: '26.12.0' }],
+    },
+  })),
   ...config.recommendedE2e,
   ...config.recommendedRpc,
   {

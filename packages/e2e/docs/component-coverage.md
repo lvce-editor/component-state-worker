@@ -17,6 +17,7 @@ without saving the file. Tabs belong to Main; menu entries belong to TitleBar.
 | Problems        | Compact filter input                                                     |
 | ProcessExplorer | Error message                                                            |
 | Source Control  | Provider unavailable message                                             |
+| SideBar         | Sidebar title; child ownership remains unchanged                         |
 | ExtensionView   | Counter text; existing dependency skip retained                          |
 | SimpleBrowser   | Address input; skipped because browser CI lacks Electron WebContentsView |
 
@@ -43,10 +44,13 @@ named, disabled cards with `componentStateView.showUnavailableComponents` enable
 - Settings
 - SideBar
 
-These components currently lack an editable component state API. Their cases
-assert that limitation explicitly and fail if the API becomes available, so the
-case can be replaced with a JSON-opening and live-edit regression. The existing
-`unavailable-components-hidden` test covers the default hidden-card behavior.
+These components lack an editable component state API in the legacy runtime. Their cases
+assert that limitation explicitly and fail if the API becomes available. The
+SideBar live state case runs in the newer runtime suite under `saved-state/src`,
+using the existing server 0.117.24 fixture. It covers JSON opening, supported title
+edits, and preservation of the Explorer child. The legacy runtime retains its
+unavailable-SideBar coverage. The existing `unavailable-components-hidden` test
+covers the default hidden-card behavior.
 
 This covers the persistent workbench views accessible in the standalone browser
 harness. Transient dialogs/popups, media and webviews requiring separate fixtures,

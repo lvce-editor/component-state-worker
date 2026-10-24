@@ -6,7 +6,7 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   await Settings.update({ 'componentStateView.showUnavailableComponents': true })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
@@ -21,5 +21,6 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   const card = Locator(`.ComponentStateCard[data-uid="${unavailableComponent.uid}"]`)
   await expect(card).toBeVisible()
   await expect(card).toHaveAttribute('disabled', '')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('State API unavailable')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('State API unavailable')
 }

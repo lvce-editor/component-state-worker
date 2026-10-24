@@ -1,34 +1,25 @@
 import { expect, jest, test } from '@jest/globals'
 
 const invoke = jest.fn()
-
+const create = jest
+  .fn<(options: { readonly send: (port: MessagePort) => Promise<void> }) => Promise<{ readonly invoke: typeof invoke }>>()
+  .mockResolvedValue({ invoke })
 jest.unstable_mockModule('@lvce-editor/rpc', () => ({
-  LazyTransferMessagePortRpcParent: {
-    create: jest.fn(async () => ({ invoke })),
-  },
+  LazyTransferMessagePortRpcParent: { create },
 }))
-
 jest.unstable_mockModule('@lvce-editor/rpc-registry', () => ({
-  RendererWorker: {
-    invokeAndTransfer: jest.fn(),
-  },
+  RendererWorker: { invokeAndTransfer: jest.fn() },
 }))
 
-const { LazyTransferMessagePortRpcParent } = await import('@lvce-editor/rpc')
 const { RendererWorker } = await import('@lvce-editor/rpc-registry')
 const MenuWorker = await import('../src/parts/MenuWorker/MenuWorker.ts')
 
-test('sends the message port to the menu worker', async () => {
-  const [[{ send }]] = jest.mocked(LazyTransferMessagePortRpcParent.create).mock.calls
+test('connects to the menu worker and preserves the view and component context', async () => {
+  const { send } = create.mock.calls[0][0]
   const port = {} as MessagePort
-
   await send(port)
-
   expect(RendererWorker.invokeAndTransfer).toHaveBeenCalledWith('SendMessagePortToExtensionHostWorker.sendMessagePortToMenuWorker', port)
-})
-
-test('shows a menu', async () => {
-  await MenuWorker.show2(7, 34, 120, 240, { componentUid: 0.25 })
-
-  expect(invoke).toHaveBeenCalledWith('Menu.show2', 7, 34, 120, 240, { componentUid: 0.25 })
+  const args = { componentUid: 0.25, domAvailable: false }
+  await MenuWorker.show2(7, 34, 120, 240, args)
+  expect(invoke).toHaveBeenCalledWith('Menu.show2', 7, 34, 120, 240, args)
 })

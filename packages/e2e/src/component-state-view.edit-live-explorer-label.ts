@@ -10,7 +10,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/original.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const originalItem = Locator('.Explorer .TreeItem[aria-label="original.txt"]')
   await expect(originalItem).toBeVisible()
@@ -24,15 +24,17 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
-  await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Explorer')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  const cardTitle = card.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('Explorer')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { items: originalItems, uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected Explorer state uid ${component.uid}, got ${uid}`)
@@ -40,7 +42,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   const items = (originalItems as readonly Item[]).map((item) =>
     item.name === 'original.txt' ? { ...item, name: 'Live explorer label' } : item,
   )
-  await Editor.setText(`${JSON.stringify({ ...state, items }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, items })
   const updatedItem = Locator('.Explorer .TreeItem[aria-label="Live explorer label"]')
   await expect(updatedItem).toBeVisible()
   await expect(originalItem).toHaveCount(0)

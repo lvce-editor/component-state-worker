@@ -2,7 +2,9 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'component-state-view.edit-live-status-bar'
 
-export const test: Test = async ({ ComponentState, Developer, Editor, expect, Locator, Settings }) => {
+export const test: Test = async ({ Command, ComponentState, Developer, Editor, expect, Locator, Settings }) => {
+  await Command.execute('ExtensionManagement.activateByEvent', 'onLanguage:json')
+  await Command.execute('Layout.handleExtensionsChanged')
   await Settings.update({ 'editor.fontFamily': 'monospace' })
   const statusBar = Locator('.StatusBar')
   await expect(statusBar).toBeVisible()
@@ -16,15 +18,17 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
-  await expect(card.locator('.ComponentStateCardTitle')).toHaveText('StatusBar')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  const cardTitle = card.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('StatusBar')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected StatusBar state uid ${component.uid}, got ${uid}`)
@@ -37,7 +41,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
       tooltip: 'Live status label',
     },
   ]
-  await Editor.setText(`${JSON.stringify({ ...state, statusBarItemsLeft }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, statusBarItemsLeft })
   const item = Locator('.StatusBarItem[name="component.state.test"]')
   await expect(item).toHaveText('Live status label')
 }

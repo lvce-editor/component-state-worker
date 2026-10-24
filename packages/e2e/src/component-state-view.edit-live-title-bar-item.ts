@@ -20,15 +20,17 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
-  await expect(card.locator('.ComponentStateCardTitle')).toHaveText('TitleBar')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  const cardTitle = card.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('TitleBar')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   const selectedTabTitle = Locator('.MainTabSelected .TabTitle')
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { titleBarEntries: originalTitleBarEntries, uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected TitleBar state uid ${component.uid}, got ${uid}`)
@@ -36,7 +38,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Lo
   const titleBarEntries = (originalTitleBarEntries as readonly Entry[]).map((entry) =>
     entry.label === 'File' ? { ...entry, label: 'Live menu label' } : entry,
   )
-  await Editor.setText(`${JSON.stringify({ ...state, titleBarEntries }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, titleBarEntries })
   const updatedEntry = Locator('.TitleBarTopLevelEntry', { hasText: 'Live menu label' })
   await expect(updatedEntry).toBeVisible()
   await expect(originalEntry).toHaveCount(0)

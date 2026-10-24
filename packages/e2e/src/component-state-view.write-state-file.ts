@@ -9,7 +9,7 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
     { content: 'second', uri: `${tmpDir}/b.txt` },
   ])
   await Settings.update({ 'componentStateView.showUnavailableComponents': true })
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()

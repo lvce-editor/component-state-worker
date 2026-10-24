@@ -5,7 +5,7 @@ export const name = 'component-state-view.editable-component'
 export const test: Test = async ({ ComponentState, Developer, expect, FileSystem, Locator, SideBar, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/file.txt`, 'content')
-  await Workspace.setPath(tmpDir)
+  await Workspace.setUri(tmpDir)
   await SideBar.open('Explorer')
   const explorerView = Locator('.Explorer')
   await expect(explorerView).toBeVisible()
@@ -18,5 +18,6 @@ export const test: Test = async ({ ComponentState, Developer, expect, FileSystem
   }
   const explorerCard = Locator(`.ComponentStateCard[data-uid="${explorer.uid}"]`)
   await expect(explorerCard).toHaveAttribute('disabled', null)
-  await expect(explorerCard.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
+  const cardStatus = explorerCard.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
 }

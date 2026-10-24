@@ -29,14 +29,16 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
   }
   const card = Locator(`.ComponentStateCard[data-uid="${component.uid}"]`)
   await expect(card).toBeVisible()
-  await expect(card.locator('.ComponentStateCardTitle')).toHaveText('Main')
-  await expect(card.locator('.ComponentStateCardStatus')).toHaveText('Open JSON state')
-  // eslint-disable-next-line e2e/no-direct-click -- the card click and its live editor subscription are the behavior under test
+  const cardTitle = card.locator('.ComponentStateCardTitle')
+  await expect(cardTitle).toHaveText('Main')
+  const cardStatus = card.locator('.ComponentStateCardStatus')
+  await expect(cardStatus).toHaveText('Open JSON state')
+  // eslint-disable-next-line e2e/no-direct-click, @typescript-eslint/no-deprecated -- the card click and its live editor subscription are the behavior under test
   await card.click()
   await expect(selectedTabTitle).toHaveText(`${component.uid}.json`)
   const editor = Locator('.Editor')
   await expect(editor).toBeVisible()
-  const state = JSON.parse(await Editor.getText())
+  const state = await Editor.getTextAsJson()
   const { layout: originalLayout, uid } = state
   if (uid !== component.uid) {
     throw new Error(`Expected Main state uid ${component.uid}, got ${uid}`)
@@ -45,7 +47,7 @@ export const test: Test = async ({ ComponentState, Developer, Editor, expect, Fi
     ...group,
     tabs: group.tabs.map((tab) => (tab.uri === uri ? { ...tab, title: 'Live tab label' } : tab)),
   }))
-  await Editor.setText(`${JSON.stringify({ ...state, layout: { ...originalLayout, groups } }, null, 2)}\n`)
+  await Editor.setJsonAsText({ ...state, layout: { ...originalLayout, groups } })
   const updatedTab = Locator('.Main .TabTitle', { hasText: 'Live tab label' })
   await expect(updatedTab).toBeVisible()
   const originalTab = Locator('.Main .TabTitle', { hasText: 'original.txt' })
