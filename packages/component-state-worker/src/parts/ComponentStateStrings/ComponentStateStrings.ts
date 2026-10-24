@@ -48,3 +48,7 @@ export const showDom = (): string => {
 export const showSavedState = (): string => {
   return i18nString(UiStrings.ShowSavedState)
 }
+
+export const copyStateAsJson = (): string => {
+  return i18nString(UiStrings.CopyStateAsJson)
+}

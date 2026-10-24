@@ -1,10 +1,10 @@
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { downloadJsonLanguageFeatures, jsonLanguageFeaturesPath } from './downloadJsonLanguageFeatures.ts'
 import { root } from './root.ts'
 
-const sharedProcessPath = join(root, 'node_modules', '@lvce-editor', 'shared-process', 'index.js')
+const sharedProcessPath = fileURLToPath(import.meta.resolve('@lvce-editor/shared-process'))
 const sharedProcess = await import(pathToFileURL(sharedProcessPath).toString())
 
 process.env.PATH_PREFIX = '/component-state-worker'
