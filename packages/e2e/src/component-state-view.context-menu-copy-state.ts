@@ -3,7 +3,7 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 export const name = 'component-state-view.context-menu-copy-state'
 const jsonStatePrefix = /^\{\n {2}"\$schema": "live-component-state:\/\/\/schemas\//
 
-export const test: Test = async ({ ClipBoard, ComponentState, ContextMenu, Developer, expect, Locator, SideBar }) => {
+export const test: Test = async ({ ClipBoard, Command, ComponentState, ContextMenu, Developer, expect, Locator, SideBar }) => {
   await SideBar.open('Explorer')
   await Developer.openComponentState()
   const components = await ComponentState.getComponents()
@@ -17,7 +17,8 @@ export const test: Test = async ({ ClipBoard, ComponentState, ContextMenu, Devel
   await expect(card).toBeVisible()
   await ClipBoard.enableMemoryClipBoard()
 
-  await card.dispatchEvent('contextmenu', { bubbles: true, button: 2, clientX: 110, clientY: 164 } as any)
+  const view = await ComponentState.getComponent('ComponentState')
+  await Command.execute('Viewlet.executeViewletCommand', view.uid, 'handleContextMenu', String(component.uid), 110, 164)
   const copyState = Locator('[role="menuitem"]', { hasText: 'Copy State as JSON' })
   await expect(copyState).toBeVisible()
   await ContextMenu.selectItem('Copy State as JSON')
